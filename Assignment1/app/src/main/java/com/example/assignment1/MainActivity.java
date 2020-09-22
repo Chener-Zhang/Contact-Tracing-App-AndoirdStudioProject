@@ -18,7 +18,6 @@ public class MainActivity extends AppCompatActivity {
     public Button setting_button;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,15 +51,22 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 System.out.println("setting trigger");
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction =fragmentManager.beginTransaction();
-
-                SettingFragment settingFragment = SettingFragment.newInstance(null,null);
-                fragmentTransaction.replace(R.id.fragment_container,settingFragment).commit();
+                //start with fragment transaction
+                setting_fragement_transaction();
 
             }
         });
     }
 
-    ;
+    public void setting_fragement_transaction() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        //create a new setting fragment
+        SettingFragment settingFragment = SettingFragment.newInstance(null, null);
+        fragmentTransaction.replace(R.id.fragment_container,settingFragment).addToBackStack(null);
+        fragmentTransaction.commit();
+
+    }
+
 }
