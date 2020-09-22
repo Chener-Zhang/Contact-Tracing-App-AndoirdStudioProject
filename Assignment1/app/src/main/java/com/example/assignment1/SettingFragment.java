@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
-public class Setting extends Fragment {
+public class SettingFragment extends Fragment {
 
 
     private static final String ARG_PARAM1 = "param1";
@@ -18,13 +18,13 @@ public class Setting extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public Setting() {
+    public SettingFragment() {
         // Required empty public constructor
     }
 
 
-    public static Setting newInstance(String param1, String param2) {
-        Setting fragment = new Setting();
+    public static SettingFragment newInstance(String param1, String param2) {
+        SettingFragment fragment = new SettingFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);

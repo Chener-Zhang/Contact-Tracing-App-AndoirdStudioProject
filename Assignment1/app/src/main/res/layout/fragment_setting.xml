@@ -4,8 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:clickable="false"
     android:orientation="vertical"
-    tools:context=".Setting">
+    tools:context=".SettingFragment">
 
     <LinearLayout
         android:id="@+id/linearLayout"

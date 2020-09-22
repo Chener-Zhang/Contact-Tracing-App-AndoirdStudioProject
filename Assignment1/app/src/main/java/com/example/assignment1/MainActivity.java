@@ -1,20 +1,23 @@
 package com.example.assignment1;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
 
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toolbar;
 
 
 public class MainActivity extends AppCompatActivity {
 
 
-    Button start_button;
-    Button stop_button;
-    Button setting_button;
+    public Button start_button;
+    public Button stop_button;
+    public Button setting_button;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +52,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 System.out.println("setting trigger");
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction =fragmentManager.beginTransaction();
+
+                SettingFragment settingFragment = SettingFragment.newInstance(null,null);
+                fragmentTransaction.replace(R.id.fragment_container,settingFragment).commit();
+
             }
         });
     }
