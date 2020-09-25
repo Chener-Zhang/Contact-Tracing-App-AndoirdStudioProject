@@ -1,16 +1,22 @@
 package com.example.assignment1;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -31,6 +37,13 @@ public class MainActivity extends AppCompatActivity {
     public static String CHANNEL_DES = "channel_description";
 
 
+    //Location component
+    public LocationManager locationManager;
+    public LocationListener locationListener;
+    public double longtitude;
+    public double latitude;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
         notificationChannel.setDescription(CHANNEL_DES);
         NotificationManager notificationManager = getSystemService(NotificationManager.class);
         notificationManager.createNotificationChannel(notificationChannel);
-
 
     }
 
@@ -79,12 +91,14 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println("start button trigger");
                 Notification_builder();
 
+
             }
         });
 
         stop_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                get_location();
                 System.out.println("stop button trigger");
             }
         });
@@ -111,4 +125,56 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public void get_location() {
+        System.out.println("get_location() trigger");
+        locationManager = getSystemService(LocationManager.class);
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(@NonNull Location location) {
+                longtitude = location.getLatitude();
+                latitude = location.getLatitude();
+                System.out.printf("Longtitude is : %f   Latitude is : %f", longtitude, latitude);
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(@NonNull String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(@NonNull String provider) {
+
+            }
+        };
+
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 111);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+            finish();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        locationManager.removeUpdates(locationListener);
+    }
 }
