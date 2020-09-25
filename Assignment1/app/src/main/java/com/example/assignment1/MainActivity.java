@@ -2,6 +2,7 @@ package com.example.assignment1;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.FragmentManager;
@@ -128,9 +129,12 @@ public class MainActivity extends AppCompatActivity {
     public void get_location() {
         System.out.println("get_location() trigger");
         locationManager = getSystemService(LocationManager.class);
+
+
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(@NonNull Location location) {
+
                 longtitude = location.getLatitude();
                 latitude = location.getLatitude();
                 System.out.printf("Longtitude is : %f   Latitude is : %f", longtitude, latitude);
@@ -152,16 +156,24 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 111);
+        //location update check
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
         }
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+            if (locationListener != null) {
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+            } else {
+                get_location();
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+            }
         }
     }
 
@@ -177,4 +189,5 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         locationManager.removeUpdates(locationListener);
     }
+
 }
