@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Notification_Detail">
+
+    <TextView
+        android:id="@+id/longtitude_view"
+        android:layout_width="match_parent"
+        android:layout_height="83dp"
+        android:text="Longtitude"
+        android:textAlignment="center"
+        android:textSize="30dp"
+        tools:layout_editor_absoluteX="176dp"
+        tools:layout_editor_absoluteY="193dp" />
+
+    <TextView
+        android:id="@+id/latitude_view"
+        android:layout_width="match_parent"
+        android:layout_height="99dp"
+        android:text="Latitude"
+        android:textAlignment="center"
+        android:textSize="30dp"
+        tools:layout_editor_absoluteX="169dp"
+        tools:layout_editor_absoluteY="388dp" />
+
+</LinearLayout>

@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
         //create a new setting fragment
         SettingFragment settingFragment = SettingFragment.newInstance(null, null);
-        fragmentTransaction.replace(R.id.fragment_container,settingFragment).addToBackStack(null);
+        fragmentTransaction.replace(R.id.fragment_container, settingFragment).addToBackStack(null);
         fragmentTransaction.commit();
 
     }
