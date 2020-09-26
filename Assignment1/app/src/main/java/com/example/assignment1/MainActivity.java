@@ -28,7 +28,7 @@ import android.view.View;
 import android.widget.Button;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements value_sender {
 
     //Button
     public Button start_button;
@@ -178,4 +178,13 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
     }
 
+
+    @Override
+    public void get_message(String x, String y) {
+        System.out.println("main activitiy has been called");
+        System.out.println("x = " + x);
+        System.out.println("y = " + y);
+
+
+    }
 }

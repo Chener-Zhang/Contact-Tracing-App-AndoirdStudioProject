@@ -28,6 +28,8 @@ public class Location_Service extends Service {
     public double longtitude;
     public double latitude;
 
+    //input distance and time
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -69,7 +71,7 @@ public class Location_Service extends Service {
         };
 
         locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 3000, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 3000, locationListener);
     }
 
     @Override
