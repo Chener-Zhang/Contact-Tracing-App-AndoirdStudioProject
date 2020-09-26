@@ -13,7 +13,10 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -38,16 +41,10 @@ public class MainActivity extends AppCompatActivity {
     public static String CHANNEL_DES = "channel_description";
 
 
-    //Location component
-    public LocationManager locationManager;
-    public LocationListener locationListener;
-    public double longtitude;
-    public double latitude;
-
-    //Intent keys
-    public static String long_key = "longtitude";
-    public static String la_key = "latitude";
-
+    public static String longtitude_key = "long_key";
+    public static String latitude_key = "lat_key";
+    //Receiver
+    BroadcastReceiver broadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,27 +54,43 @@ public class MainActivity extends AppCompatActivity {
         //Init Buttons
         button_init();
 
-        //Check SKD
-
+        //init notification
         NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
         notificationChannel.setDescription(CHANNEL_DES);
         NotificationManager notificationManager = getSystemService(NotificationManager.class);
         notificationManager.createNotificationChannel(notificationChannel);
 
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (broadcastReceiver != null) {
+            unregisterReceiver(broadcastReceiver);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+            finish();
+        } else {
+            permission_checking();
+        }
+    }
+
+
+    public boolean permission_checking() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     public void Notification_builder() {
-        Intent detail_intent = new Intent(this, Notification_Detail.class);
-
-        //putExtra of location detail coordinate
-        Bundle bundle = new Bundle();
-        bundle.putDouble(long_key, longtitude);
-        bundle.putDouble(la_key, latitude);
-        detail_intent.putExtras(bundle);
-        detail_intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        //putExtra of location detail coordinate complete
-
-
+        Intent detail_intent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 1, detail_intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 
@@ -103,9 +116,9 @@ public class MainActivity extends AppCompatActivity {
         start_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                System.out.println("start button trigger");
-                Notification_builder();
 
+                Intent intent = new Intent(getApplicationContext(), Location_Service.class);
+                startService(intent);
 
             }
         });
@@ -113,8 +126,9 @@ public class MainActivity extends AppCompatActivity {
         stop_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                get_location();
                 System.out.println("stop button trigger");
+                Intent intent = new Intent(getApplicationContext(), Location_Service.class);
+                stopService(intent);
             }
         });
 
@@ -140,68 +154,28 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void get_location() {
-        System.out.println("get_location() trigger");
-        locationManager = getSystemService(LocationManager.class);
-
-
-        locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(@NonNull Location location) {
-
-                longtitude = location.getLatitude();
-                latitude = location.getLatitude();
-//                System.out.printf("Longtitude is : %f   Latitude is : %f", longtitude, latitude);
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(@NonNull String provider) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(@NonNull String provider) {
-
-            }
-        };
-
-        //location update check
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-
-    }
 
     @Override
     protected void onResume() {
         super.onResume();
+        if (broadcastReceiver == null) {
+            broadcastReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
 
-        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            if (locationListener != null) {
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-            } else {
-                get_location();
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-            }
+                    System.out.println("longtitude is  " + intent.getExtras().get(longtitude_key));
+                    System.out.println("latitude is  " + intent.getExtras().get(latitude_key));
+                }
+            };
         }
+        registerReceiver(broadcastReceiver, new IntentFilter("location_update"));
+
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-            finish();
-        }
-    }
 
     @Override
     protected void onPause() {
         super.onPause();
-        locationManager.removeUpdates(locationListener);
     }
 
 }
