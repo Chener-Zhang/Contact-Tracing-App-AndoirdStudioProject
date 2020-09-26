@@ -44,6 +44,10 @@ public class MainActivity extends AppCompatActivity {
     public double longtitude;
     public double latitude;
 
+    //Intent keys
+    public static String long_key = "longtitude";
+    public static String la_key = "latitude";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +68,16 @@ public class MainActivity extends AppCompatActivity {
 
     public void Notification_builder() {
         Intent detail_intent = new Intent(this, Notification_Detail.class);
+
+        //putExtra of location detail coordinate
+        Bundle bundle = new Bundle();
+        bundle.putDouble(long_key, longtitude);
+        bundle.putDouble(la_key, latitude);
+        detail_intent.putExtras(bundle);
+        detail_intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        //putExtra of location detail coordinate complete
+
+
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 1, detail_intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 
@@ -137,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
 
                 longtitude = location.getLatitude();
                 latitude = location.getLatitude();
-                System.out.printf("Longtitude is : %f   Latitude is : %f", longtitude, latitude);
+//                System.out.printf("Longtitude is : %f   Latitude is : %f", longtitude, latitude);
             }
 
             @Override
