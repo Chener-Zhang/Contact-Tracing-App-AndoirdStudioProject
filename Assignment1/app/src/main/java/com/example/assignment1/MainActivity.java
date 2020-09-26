@@ -3,27 +3,17 @@ package com.example.assignment1;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
+
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
-
 import android.view.View;
 import android.widget.Button;
 
@@ -35,14 +25,12 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     public Button stop_button;
     public Button setting_button;
 
-    //Notification component
-    public static String CHANNEL_ID = "channel_id";
-    public static String CHANNEL_NAME = "channel_name";
-    public static String CHANNEL_DES = "channel_description";
-
 
     public static String longtitude_key = "long_key";
     public static String latitude_key = "lat_key";
+    public String userinput_distance;
+    public String userinput_time;
+
     //Receiver
     BroadcastReceiver broadcastReceiver;
 
@@ -50,15 +38,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         //Init Buttons
         button_init();
-
-        //init notification
-        NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
-        notificationChannel.setDescription(CHANNEL_DES);
-        NotificationManager notificationManager = getSystemService(NotificationManager.class);
-        notificationManager.createNotificationChannel(notificationChannel);
 
 
     }
@@ -80,7 +61,6 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         }
     }
 
-
     public boolean permission_checking() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return false;
@@ -89,24 +69,15 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         }
     }
 
-    public void Notification_builder() {
-        Intent detail_intent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 1, detail_intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-
-        NotificationCompat.Builder N_builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.messages)
-                .setContentTitle("Notification Ttile")
-                .setContentText("Notification contentext")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setAutoCancel(true)
-                .setContentIntent(pendingIntent);
-
-        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
-        notificationManagerCompat.notify(1, N_builder.build());
+    @Override
+    public void get_message(String distance, String time) {
+        userinput_distance = distance;
+        userinput_time = time;
+        System.out.println("x = " + userinput_time);
+        System.out.println("y = " + userinput_distance);
 
     }
-
 
     public void button_init() {
         start_button = (Button) findViewById(R.id.start_button);
@@ -118,6 +89,12 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             public void onClick(View view) {
 
                 Intent intent = new Intent(getApplicationContext(), Location_Service.class);
+
+                System.out.println("distance = " + userinput_distance);
+                System.out.println("time = " + userinput_time);
+                intent.putExtra("distance", userinput_distance);
+                intent.putExtra("time", userinput_time);
+
                 startService(intent);
 
             }
@@ -128,6 +105,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             public void onClick(View view) {
                 System.out.println("stop button trigger");
                 Intent intent = new Intent(getApplicationContext(), Location_Service.class);
+
+
                 stopService(intent);
             }
         });
@@ -178,13 +157,4 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         super.onPause();
     }
 
-
-    @Override
-    public void get_message(String x, String y) {
-        System.out.println("main activitiy has been called");
-        System.out.println("x = " + x);
-        System.out.println("y = " + y);
-
-
-    }
 }

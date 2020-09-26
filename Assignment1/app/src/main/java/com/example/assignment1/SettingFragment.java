@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 
 interface value_sender {
-    public void get_message(String x, String y);
+    public void get_message(String distance, String time);
 }
 
 public class SettingFragment extends Fragment {
@@ -82,7 +82,8 @@ public class SettingFragment extends Fragment {
                 System.out.println("button clicked");
                 String x = TRACING_DISCANTE.getText().toString();
                 String y = SEDEMTARY_TIME.getText().toString();
-                System.out.printf("x is : %s  y is %s  ", x, y);
+
+
                 value_sender.get_message(x, y);
             }
         });
