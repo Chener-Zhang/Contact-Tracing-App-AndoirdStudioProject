@@ -2,6 +2,7 @@ package com.example.assignment1;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -13,6 +14,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
@@ -22,7 +25,6 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     //Button
     public Button start_button;
     public Button stop_button;
-    public Button setting_button;
 
     //Key
     public static String longtitude_key = "long_key";
@@ -33,17 +35,39 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     public String userinput_time;
 
     //Receiver
-    BroadcastReceiver broadcastReceiver;
+    public BroadcastReceiver broadcastReceiver;
+
+
+    //Tool bar
+    public Toolbar toolbar;
+    public MenuItem menuItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //toolbar init
+        toolbar = findViewById(R.id.my_toolbar);
+        setSupportActionBar(toolbar);
         //Set button and click listener
         button_init();
+
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.my_menu, menu);
+        menuItem = menu.findItem(R.id.setting_menu);
+        menuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                setting_fragement_transaction();
+                return true;
+            }
+        });
+        return true;
+    }
 
     @Override
     protected void onDestroy() {
@@ -87,7 +111,6 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
         start_button = (Button) findViewById(R.id.start_button);
         stop_button = (Button) findViewById(R.id.stop_button);
-        setting_button = (Button) findViewById(R.id.setting_button);
 
         start_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,15 +141,6 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             }
         });
 
-        setting_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                //start with fragment transaction
-                setting_fragement_transaction();
-
-            }
-        });
     }
 
     public void setting_fragement_transaction() {
