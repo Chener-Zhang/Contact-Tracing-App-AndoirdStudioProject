@@ -1,6 +1,5 @@
 package com.example.assignment1;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 
@@ -12,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 
 interface value_sender {
@@ -32,10 +30,10 @@ public class SettingFragment extends Fragment {
     private String mParam2;
     public EditText SEDEMTARY_TIME;
     public Button SUBMIT_BUTTON;
-    value_sender value_sender;
+    public Button GENERATION_BUTTON;
+    public value_sender value_sender;
 
     public SettingFragment() {
-        // Required empty public constructor
     }
 
 
@@ -75,6 +73,9 @@ public class SettingFragment extends Fragment {
         TRACING_DISCANTE = view.findViewById(R.id.tracing_distance);
         SEDEMTARY_TIME = view.findViewById(R.id.sedentary_time);
         SUBMIT_BUTTON = view.findViewById(R.id.submit_button);
+        GENERATION_BUTTON = view.findViewById(R.id.token_generator);
+
+
         //edit text and button setup complete
         SUBMIT_BUTTON.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,15 +83,18 @@ public class SettingFragment extends Fragment {
                 System.out.println("button clicked");
                 String x = TRACING_DISCANTE.getText().toString();
                 String y = SEDEMTARY_TIME.getText().toString();
-
-
                 value_sender.get_message(x, y);
             }
         });
-
-
+        //generate tokens
+        GENERATION_BUTTON.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Token new_Token = new Token();
+                new_Token.toString();
+            }
+        });
         return view;
     }
-
 
 }
