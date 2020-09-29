@@ -1,4 +1,4 @@
-package com.example.assignment1;
+package com.example.contacttracer;
 
 import android.annotation.SuppressLint;
 import android.app.NotificationChannel;

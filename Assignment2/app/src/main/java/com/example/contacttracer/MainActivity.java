@@ -1,4 +1,4 @@
-package com.example.assignment1;
+package com.example.contacttracer;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
