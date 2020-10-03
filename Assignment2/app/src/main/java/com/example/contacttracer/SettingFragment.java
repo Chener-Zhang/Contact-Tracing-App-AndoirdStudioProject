@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.io.IOException;
+
 
 interface value_sender {
     public void get_message(String distance, String time);
@@ -32,6 +34,10 @@ public class SettingFragment extends Fragment {
     public Button SUBMIT_BUTTON;
     public Button GENERATION_BUTTON;
     public value_sender value_sender;
+
+
+    //Storage class
+    public Storage storage;
 
     public SettingFragment() {
     }
@@ -90,8 +96,27 @@ public class SettingFragment extends Fragment {
         GENERATION_BUTTON.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                //create a new tocken
                 Token new_Token = new Token();
-                new_Token.toString();
+                String message = new_Token.toString();
+                //init the storage
+                storage = new Storage();
+                if (storage.check_file(storage.PATH)) {
+                    try {
+                        storage.write_file(message);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    try {
+                        storage.append_message(storage.FILENAME, message);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+
             }
         });
         return view;
