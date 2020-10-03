@@ -3,7 +3,10 @@ package edu.temple.contacttracer;
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -11,19 +14,42 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity implements StartupFragment.FragmentInteractionInterface {
-
     FragmentManager fm;
+
     Intent serviceIntent;
     UUIDContainer uuidContainer;
+
+
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            System.out.println("you have receive from the broadcaster : \n" + intent.getStringExtra("message"));
+        }
+    };
+
+    IntentFilter intentFilter;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, intentFilter);
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        //Intent filter
+        intentFilter = new IntentFilter(getPackageName() + "CHAT_MESSAGE");
 
         // Retrieve UUID container from storage
         uuidContainer = UUIDContainer.getUUIDContainer(this);
@@ -55,16 +81,20 @@ public class MainActivity extends AppCompatActivity implements StartupFragment.F
 
         serviceIntent = new Intent(this, ContactTracingService.class);
 
+
         fm = getSupportFragmentManager();
 
         if (fm.findFragmentById(R.id.container) == null)
             fm.beginTransaction()
                     .add(R.id.container, new StartupFragment())
                     .commit();
+
+
     }
 
     @Override
     public void startService() {
+
         startService(serviceIntent);
     }
 
@@ -77,15 +107,21 @@ public class MainActivity extends AppCompatActivity implements StartupFragment.F
     public void settingsMenu() {
         fm.beginTransaction()
                 .replace(R.id.container, new SettingsFragment())
-        .addToBackStack(null)
-        .commit();
+                .addToBackStack(null)
+                .commit();
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (grantResults[0] == PackageManager.PERMISSION_DENIED){
+        if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
             Toast.makeText(this, "You must grant Location permission", Toast.LENGTH_LONG).show();
             finish();
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
     }
 }
