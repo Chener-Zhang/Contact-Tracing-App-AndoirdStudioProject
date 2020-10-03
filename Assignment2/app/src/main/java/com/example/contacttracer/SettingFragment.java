@@ -35,9 +35,7 @@ public class SettingFragment extends Fragment {
     public Button GENERATION_BUTTON;
     public value_sender value_sender;
 
-
-    //Storage class
-    public Storage storage;
+    
 
     public SettingFragment() {
     }
@@ -101,20 +99,7 @@ public class SettingFragment extends Fragment {
                 Token new_Token = new Token();
                 String message = new_Token.toString();
                 //init the storage
-                storage = new Storage();
-                if (storage.check_file(storage.PATH)) {
-                    try {
-                        storage.write_file(message);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    try {
-                        storage.append_message(storage.FILENAME, message);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
+
 
 
             }

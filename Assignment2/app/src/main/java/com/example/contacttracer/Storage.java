@@ -8,7 +8,7 @@ import java.io.IOException;
 public class Storage {
 
     public String FILENAME = "store.txt";
-    public String PATH = "src/main/java/com/example/contacttracer/store.txt";
+    public String PATH = "C:\\Users\\chene\\Desktop\\CIS-4515\\Assignment2\\app\\src\\main\\java\\com\\example\\contacttracer\\store.txt";
 
     public Storage() {
 
