@@ -37,15 +37,14 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.temple.contacttracer.R;
-
 
 public class MainActivity extends AppCompatActivity implements value_sender {
 
     //Button
     public Button start_button;
     public Button stop_button;
-    public Button Token_generator;
+    public Button token_generator;
+    public Button clear_button;
     //Share preference
     public static final String MyPREFERENCES = "MyPrefs";
 
@@ -81,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     Intent firebase_intent;
     public Button Get_token;
     SharedPreferences sharedpreferences;
+    SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,10 +89,13 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
         //init the share preference
         sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        editor = sharedpreferences.edit();
 
         //toolbar init
         toolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
+
+
         //Set button and click listener
         button_init();
 
@@ -100,36 +103,6 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
-
-        Token_generator = (Button) findViewById(R.id.token_generator);
-        Token_generator.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.d("button", "trigger");
-                Log.d("Long", String.valueOf(longtitude));
-                Log.d("La", String.valueOf(longtitude));
-
-                SharedPreferences.Editor editor = sharedpreferences.edit();
-                Token token = new Token(latitude, longtitude, sedentary_begin, sedentary_end);
-
-                String latitude_to_string = String.valueOf(latitude);
-                String longtitude_to_string = String.valueOf(longtitude);
-                editor.putString("latitude", latitude_to_string);
-                editor.putString("longtitude", longtitude_to_string);
-                editor.putLong("sedentary_begin", sedentary_begin);
-                editor.putLong("sedentary_end", sedentary_end);
-                editor.apply();
-
-            }
-        });
-
-        Get_token = (Button) findViewById(R.id.get_tocken);
-        Get_token.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                System.out.println(sharedpreferences.getAll());
-            }
-        });
 
         //Firebase Cloud Messaging
 
@@ -149,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                         if (!task.isSuccessful()) {
                             Log.d("Subscribe ", "Fail");
                         }
-                        Log.d("subscribe", "success");
+                        Log.d("subscribe : ", "success");
                     }
                 });
 
@@ -159,30 +132,28 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        System.out.println("response from post request " + response);
+                        Log.d("Response from post request \n", response);
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                System.out.println("get the VolleyError " + error.toString());
+
+                Log.d("onErrorResponse", error.toString());
             }
         }) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
-
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("uuid", "test");
-                params.put("latitude", "test");
-                params.put("longitude", "test");
-                params.put("sedentary_begin", "test");
-                params.put("sedentary_end", "test");
+                params.put("uuid", "chener");
+                params.put("latitude", sharedpreferences.getString("latitude", ""));
+                params.put("longitude", sharedpreferences.getString("longtitude", ""));
+                params.put("sedentary_begin", sharedpreferences.getString("sedentary_begin", ""));
+                params.put("sedentary_end", sharedpreferences.getString("sedentary_end", ""));
                 return params;
-
             }
         };
         postqueue.add(postquest);
         //POST REQUEST END
-
 
     }
 
@@ -234,15 +205,51 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     public void get_message(String distance, String time) {
         userinput_distance = distance;
         userinput_time = time;
-
-        System.out.println("x = " + userinput_time);
-        System.out.println("y = " + userinput_distance);
     }
 
     public void button_init() {
-
         start_button = (Button) findViewById(R.id.start_button);
         stop_button = (Button) findViewById(R.id.stop_button);
+        token_generator = (Button) findViewById(R.id.token_generator);
+        clear_button = (Button) findViewById(R.id.clear);
+        clear_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                editor.clear();
+                editor.commit();
+                System.out.println("Tokens have been all clear");
+            }
+        });
+        token_generator.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("button", "trigger");
+                Log.d("Long", String.valueOf(longtitude));
+                Log.d("La", String.valueOf(longtitude));
+                Token token = new Token(latitude, longtitude, sedentary_begin, sedentary_end);
+
+                String latitude_to_string = String.valueOf(latitude);
+                String longtitude_to_string = String.valueOf(longtitude);
+                String sedentary_begin_to_string = Long.valueOf(sedentary_begin).toString();
+                String sedentary_end_to_string = Long.valueOf(sedentary_end).toString();
+
+
+                editor.putString("uuid", String.valueOf(token.UUID));
+                editor.putString("latitude", latitude_to_string);
+                editor.putString("longtitude", longtitude_to_string);
+                editor.putString("sedentary_begin ", sedentary_begin_to_string);
+                editor.putString("sedentary_end ", sedentary_end_to_string);
+                editor.commit();
+            }
+        });
+
+        Get_token = (Button) findViewById(R.id.get_tocken);
+        Get_token.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                System.out.println(sharedpreferences.getAll());
+            }
+        });
 
         start_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -251,12 +258,6 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                 Intent intent = new Intent(getApplicationContext(), Location_Service.class);
                 intent.putExtra("distance", userinput_distance);
                 intent.putExtra("time", userinput_time);
-
-                System.out.println("distance = " + userinput_distance);
-                System.out.println();
-                System.out.println("time = " + userinput_time);
-                System.out.println();
-
                 startService(intent);
 
             }
@@ -265,10 +266,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         stop_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 Intent intent = new Intent(getApplicationContext(), Location_Service.class);
                 stopService(intent);
-
             }
         });
 
