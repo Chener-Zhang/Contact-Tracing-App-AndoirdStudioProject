@@ -24,15 +24,14 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="textPersonName"
-            android:text="@string/distance" />
+             />
 
         <EditText
             android:id="@+id/sedentary_time"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:inputType="textPersonName"
-            android:text="@string/time" />
+            android:inputType="textPersonName" />
     </LinearLayout>
 
     <Button

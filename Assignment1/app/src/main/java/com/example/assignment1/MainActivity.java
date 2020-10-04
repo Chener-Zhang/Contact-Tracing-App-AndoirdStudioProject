@@ -31,6 +31,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     //Key
     public static String longtitude_key = "long_key";
     public static String latitude_key = "lat_key";
+    public static String sendentary_begin_key = "sendentary_begin_key";
+    public static String sendentary_end_key = "sendentary_end_key";
 
     //User input declaration
     public String userinput_distance;
@@ -48,6 +50,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     //Dynamic Variable;
     public double longtitude;
     public double latitude;
+    public long sedentary_begin;
+    public long sedentary_end;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -187,9 +191,14 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                 public void onReceive(Context context, Intent intent) {
                     longtitude = (double) intent.getExtras().get(longtitude_key);
                     latitude = (double) intent.getExtras().get(latitude_key);
+                    sedentary_begin = (long) intent.getExtras().get(sendentary_begin_key);
+                    sedentary_end = (long) intent.getExtras().get(sendentary_end_key);
+
                     System.out.println("longtitude is  " + longtitude);
                     System.out.println("latitude is  " + latitude);
-
+                    System.out.println("begin is  " + sedentary_begin);
+                    System.out.println("end is  " + sedentary_end);
+                    
                 }
             };
         }

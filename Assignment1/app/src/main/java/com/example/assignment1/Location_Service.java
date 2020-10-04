@@ -1,6 +1,5 @@
 package com.example.assignment1;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -8,7 +7,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -18,7 +16,6 @@ import android.provider.Settings;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
@@ -26,6 +23,8 @@ public class Location_Service extends Service {
     //key declaration
     public static String longtitude_key = "long_key";
     public static String latitude_key = "lat_key";
+    public static String sendentary_begin_key = "sendentary_begin_key";
+    public static String sendentary_end_key = "sendentary_end_key";
 
     //Location component
     public LocationManager locationManager;
@@ -43,6 +42,11 @@ public class Location_Service extends Service {
     //Tracing_Distance and Sedentary_time
     public String Tracing_distance;
     public String Sedentary_time;
+    //Location time
+    public long sedentary_begin;
+    public long sedentary_end;
+    //Location change
+    Location last_location;
 
     @Nullable
     @Override
@@ -79,6 +83,15 @@ public class Location_Service extends Service {
             @Override
             public void onLocationChanged(@NonNull Location location) {
 
+                sedentary_begin = location.getTime();
+
+                if (last_location != null) {
+                    sedentary_end = last_location.getTime();
+                } else {
+                    last_location = location;
+                }
+
+
                 Intent i = new Intent("location_update");
 
                 longtitude = location.getLongitude();
@@ -86,6 +99,8 @@ public class Location_Service extends Service {
 
                 i.putExtra(longtitude_key, latitude);
                 i.putExtra(latitude_key, latitude);
+                i.putExtra(sendentary_begin_key, sedentary_begin);
+                i.putExtra(sendentary_end_key, sedentary_end);
 
                 //send broadcast
                 sendBroadcast(i);

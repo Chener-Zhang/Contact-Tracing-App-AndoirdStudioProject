@@ -68,14 +68,21 @@ public class ContactTracingService extends Service {
 
             public void onStatusChanged(String provider, int status, Bundle extras) {
             }
-
             public void onProviderEnabled(String provider) {
             }
-
             public void onProviderDisabled(String provider) {
             }
         };
 
+    }
+
+    /**
+     * Should be called when a user has loitered in a location for
+     * longer than the designated time.
+     */
+    private void tracePointDetected() {
+        String message = lastLocation.getLatitude() + " - " + lastLocation.getLongitude() + " at " + lastLocation.getTime();
+        Log.i("Trace Data", message);
     }
 
     @Override
@@ -104,15 +111,6 @@ public class ContactTracingService extends Service {
         startForeground(1, notification);
 
         return super.onStartCommand(intent, flags, startId);
-    }
-
-    /**
-     * Should be called when a user has loitered in a location for
-     * longer than the designated time.
-     */
-    private void tracePointDetected() {
-        String message = lastLocation.getLatitude() + " - " + lastLocation.getLongitude() + " at " + lastLocation.getTime();
-        Log.i("Trace Data", message);
     }
 
     @Override
