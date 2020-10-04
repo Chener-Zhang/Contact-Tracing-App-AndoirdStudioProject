@@ -62,6 +62,17 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
+
+        Token_generator = (Button) findViewById(R.id.token_generator);
+        Token_generator.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("button", "trigger");
+                Log.d("Long", String.valueOf(longtitude));
+                Log.d("La", String.valueOf(longtitude));
+            }
+        });
+
     }
 
     @Override

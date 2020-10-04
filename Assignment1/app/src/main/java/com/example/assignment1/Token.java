@@ -7,13 +7,17 @@ import java.time.LocalDateTime;
 public class Token {
     public int UUID;
     public LocalDateTime date;
+    public long latitude;
+    public long longtitude;
 
     public static int min = 0;
     public static int max = 1000;
 
-    public Token() {
+    public Token(long latitude, long longtitude) {
         this.UUID = Token_generator();
         this.date = getDate();
+        this.latitude = latitude;
+        this.longtitude = longtitude;
         System.out.println("UUID : " + this.UUID + "\n" + "DATE : " + this.date + " \n");
     }
 
