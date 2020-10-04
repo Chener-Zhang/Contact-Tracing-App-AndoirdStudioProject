@@ -16,6 +16,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     Context context;
     SharedPreferences preferences;
 
+
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -31,9 +32,19 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         findPreference(Constants.PREF_KEY_UUID).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
+                //UUID Generate here
                 UUIDContainer uuidContainer = UUIDContainer.getUUIDContainer(context);
                 uuidContainer.generateUUID();
                 Toast.makeText(getActivity(), "New UUID generated", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
+
+        findPreference(Constants.GET_UUID_BUTTON).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                UUIDContainer uuidContainer = UUIDContainer.getUUIDContainer(context);
+                System.out.println(uuidContainer.get_UUID());
                 return true;
             }
         });

@@ -93,7 +93,6 @@ public class MainActivity extends AppCompatActivity implements StartupFragment.F
                     .commit();
 
 
-
     }
 
     @Override

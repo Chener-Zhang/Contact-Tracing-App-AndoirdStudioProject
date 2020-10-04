@@ -17,7 +17,7 @@ import androidx.fragment.app.Fragment;
 public class StartupFragment extends Fragment {
 
     FragmentInteractionInterface parent;
-    Button startButton, stopButton, testButton_start, testButton_stop;
+    Button startButton, stopButton;
 
     public StartupFragment() {
     }

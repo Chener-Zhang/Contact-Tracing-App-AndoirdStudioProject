@@ -94,4 +94,9 @@ public class UUIDContainer implements Serializable {
             e.printStackTrace();
         }
     }
+
+    //Get all saved UUID
+    public ArrayList<TraceUUID> get_UUID() {
+        return this.UUIDs;
+    }
 }

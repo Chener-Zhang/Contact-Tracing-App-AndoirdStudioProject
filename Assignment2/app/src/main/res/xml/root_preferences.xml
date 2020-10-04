@@ -26,8 +26,14 @@
         <Preference
             app:key="pref_uuid"
             app:title="Generate new ID"
-            app:summary="Generate a new ID to prevent eavesdropping"/>
+            app:summary="Generate a new ID to prevent eavesdropping" />
+
+        <Preference
+            app:key="get_uuid"
+            app:summary="get all UUID history"
+            app:title="GET UUID" />
 
     </PreferenceCategory>
+
 
 </PreferenceScreen>
