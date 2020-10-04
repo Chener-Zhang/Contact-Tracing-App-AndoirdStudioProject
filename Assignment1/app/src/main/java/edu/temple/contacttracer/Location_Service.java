@@ -1,4 +1,4 @@
-package com.example.assignment1;
+package edu.temple.contacttracer;
 
 import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
@@ -18,6 +18,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+
+import com.example.contacttracer.R;
 
 public class Location_Service extends Service {
     //key declaration

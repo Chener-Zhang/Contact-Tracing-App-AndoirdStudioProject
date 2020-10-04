@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="#EFF7FB"
     android:orientation="vertical"
-    tools:context=".SettingFragment">
+    tools:context="edu.temple.contacttracer.SettingFragment">
 
     <LinearLayout
         android:id="@+id/linearLayout"

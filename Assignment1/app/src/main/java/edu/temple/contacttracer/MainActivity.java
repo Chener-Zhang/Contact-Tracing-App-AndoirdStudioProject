@@ -1,4 +1,4 @@
-package com.example.assignment1;
+package edu.temple.contacttracer;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,6 +19,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+
+import com.example.contacttracer.R;
 
 
 public class MainActivity extends AppCompatActivity implements value_sender {
@@ -198,7 +200,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                     System.out.println("latitude is  " + latitude);
                     System.out.println("begin is  " + sedentary_begin);
                     System.out.println("end is  " + sedentary_end);
-                    
+
                 }
             };
         }

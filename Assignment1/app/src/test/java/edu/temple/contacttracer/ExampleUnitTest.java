@@ -1,4 +1,4 @@
-package com.example.assignment1;
+package edu.temple.contacttracer;
 
 import org.junit.Test;
 
