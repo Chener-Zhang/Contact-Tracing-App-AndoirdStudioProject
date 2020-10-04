@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     //Button
     public Button start_button;
     public Button stop_button;
+    public Button Token_generator;
 
     //Key
     public static String longtitude_key = "long_key";
@@ -42,6 +44,11 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     public Toolbar toolbar;
     public MenuItem menuItem;
 
+
+    //Dynamic Variable;
+    public double longtitude;
+    public double latitude;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,7 +59,9 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         setSupportActionBar(toolbar);
         //Set button and click listener
         button_init();
-
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        }
     }
 
     @Override
@@ -82,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
             // User permission granted fail;
+            Log.d("USER GPD PERMISSION :  ", " FAIL ");
             finish();
         } else {
             permission_checking();
@@ -120,7 +130,6 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                 intent.putExtra("distance", userinput_distance);
                 intent.putExtra("time", userinput_time);
 
-
                 System.out.println("distance = " + userinput_distance);
                 System.out.println();
                 System.out.println("time = " + userinput_time);
@@ -140,6 +149,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
             }
         });
+
 
     }
 
@@ -164,8 +174,11 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             broadcastReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
-                    System.out.println("longtitude is  " + intent.getExtras().get(longtitude_key));
-                    System.out.println("latitude is  " + intent.getExtras().get(latitude_key));
+                    longtitude = (double) intent.getExtras().get(longtitude_key);
+                    latitude = (double) intent.getExtras().get(latitude_key);
+                    System.out.println("longtitude is  " + longtitude);
+                    System.out.println("latitude is  " + latitude);
+
                 }
             };
         }

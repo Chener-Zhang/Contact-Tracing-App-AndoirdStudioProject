@@ -30,7 +30,7 @@ public class SettingFragment extends Fragment {
     private String mParam2;
     public EditText SEDEMTARY_TIME;
     public Button SUBMIT_BUTTON;
-    public Button GENERATION_BUTTON;
+
     public value_sender value_sender;
 
     public SettingFragment() {
@@ -73,7 +73,6 @@ public class SettingFragment extends Fragment {
         TRACING_DISCANTE = view.findViewById(R.id.tracing_distance);
         SEDEMTARY_TIME = view.findViewById(R.id.sedentary_time);
         SUBMIT_BUTTON = view.findViewById(R.id.submit_button);
-        GENERATION_BUTTON = view.findViewById(R.id.token_generator);
 
 
         //edit text and button setup complete
@@ -86,14 +85,7 @@ public class SettingFragment extends Fragment {
                 value_sender.get_message(x, y);
             }
         });
-        //generate tokens
-        GENERATION_BUTTON.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Token new_Token = new Token();
-                new_Token.toString();
-            }
-        });
+
         return view;
     }
 
