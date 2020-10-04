@@ -1,24 +1,31 @@
 package edu.temple.contacttracer;
 
 
+import android.util.Log;
+
 import java.time.LocalDateTime;
 
 
 public class Token {
     public int UUID;
     public LocalDateTime date;
-    public long latitude;
-    public long longtitude;
+    public double latitude;
+    public double longtitude;
+    public long sedentary_begin;
+    public long sedentary_end;
 
     public static int min = 0;
     public static int max = 1000;
 
-    public Token(long latitude, long longtitude) {
+    public Token(double latitude, double longtitude, long sedentary_begin, long sedentary_end) {
         this.UUID = Token_generator();
         this.date = getDate();
         this.latitude = latitude;
         this.longtitude = longtitude;
-        System.out.println("UUID : " + this.UUID + "\n" + "DATE : " + this.date + " \n");
+        this.sedentary_begin = sedentary_begin;
+        this.sedentary_end = sedentary_end;
+
+        Log.d("UUID : DATA : LATITUDE : LONGTITUDE : SEDENTARY_BEGIN : SEDENTARY_END", String.valueOf(this.UUID) + this.date + this.latitude + this.longtitude + this.sedentary_begin + this.sedentary_end);
     }
 
     public int Token_generator() {

@@ -12,6 +12,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -45,6 +46,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     public Button start_button;
     public Button stop_button;
     public Button Token_generator;
+    //Share preference
+    public static final String MyPREFERENCES = "MyPrefs";
 
     //Key
     public static String longtitude_key = "long_key";
@@ -76,11 +79,16 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     public static String url = "https://kamorris.com/lab/ct_tracking.php";
     //Firebase intent
     Intent firebase_intent;
+    public Button Get_token;
+    SharedPreferences sharedpreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //init the share preference
+        sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
 
         //toolbar init
         toolbar = findViewById(R.id.my_toolbar);
@@ -100,9 +108,28 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                 Log.d("button", "trigger");
                 Log.d("Long", String.valueOf(longtitude));
                 Log.d("La", String.valueOf(longtitude));
+
+                SharedPreferences.Editor editor = sharedpreferences.edit();
+                Token token = new Token(latitude, longtitude, sedentary_begin, sedentary_end);
+
+                String latitude_to_string = String.valueOf(latitude);
+                String longtitude_to_string = String.valueOf(longtitude);
+                editor.putString("latitude", latitude_to_string);
+                editor.putString("longtitude", longtitude_to_string);
+                editor.putLong("sedentary_begin", sedentary_begin);
+                editor.putLong("sedentary_end", sedentary_end);
+                editor.apply();
+
             }
         });
 
+        Get_token = (Button) findViewById(R.id.get_tocken);
+        Get_token.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                System.out.println(sharedpreferences.getAll());
+            }
+        });
 
         //Firebase Cloud Messaging
 
