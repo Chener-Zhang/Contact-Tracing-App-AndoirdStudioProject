@@ -20,7 +20,23 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
-import com.example.contacttracer.R;
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
+import com.google.firebase.messaging.FirebaseMessaging;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import edu.temple.contacttracer.R;
 
 
 public class MainActivity extends AppCompatActivity implements value_sender {
@@ -55,6 +71,12 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     public long sedentary_begin;
     public long sedentary_end;
 
+
+    //URL
+    public static String url = "https://kamorris.com/lab/ct_tracking.php";
+    //Firebase intent
+    Intent firebase_intent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,6 +87,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         setSupportActionBar(toolbar);
         //Set button and click listener
         button_init();
+
+        //Permission check
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
@@ -78,6 +102,60 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                 Log.d("La", String.valueOf(longtitude));
             }
         });
+
+
+        //Firebase Cloud Messaging
+
+        firebase_intent = new Intent(this, FirebaseCloudMessaging.class);
+        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+            @Override
+            public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                Log.d("FCM Token f/Activities", task.getResult().getToken());
+                Log.d("FCM Id f/Activities", task.getResult().getId());
+            }
+        });
+
+        FirebaseMessaging.getInstance().subscribeToTopic("TRACKING")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (!task.isSuccessful()) {
+                            Log.d("Subscribe ", "Fail");
+                        }
+                        Log.d("subscribe", "success");
+                    }
+                });
+
+        //POST REQUEST BEGIN
+        RequestQueue postqueue = Volley.newRequestQueue(this);
+        StringRequest postquest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        System.out.println("response from post request " + response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.out.println("get the VolleyError " + error.toString());
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("uuid", "test");
+                params.put("latitude", "test");
+                params.put("longitude", "test");
+                params.put("sedentary_begin", "test");
+                params.put("sedentary_end", "test");
+                return params;
+
+            }
+        };
+        postqueue.add(postquest);
+        //POST REQUEST END
+
 
     }
 

@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.example.contacttracer.R;
+import edu.temple.contacttracer.R;
 
 
 interface value_sender {
