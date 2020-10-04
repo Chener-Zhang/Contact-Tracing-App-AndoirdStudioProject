@@ -17,9 +17,10 @@ import androidx.fragment.app.Fragment;
 public class StartupFragment extends Fragment {
 
     FragmentInteractionInterface parent;
-    Button startButton, stopButton;
+    Button startButton, stopButton, testButton_start, testButton_stop;
 
-    public StartupFragment() {}
+    public StartupFragment() {
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -53,14 +54,13 @@ public class StartupFragment extends Fragment {
                 parent.startService();
             }
         });
-
         stopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 parent.stopService();
             }
         });
-        stopButton = v.findViewById(R.id.stopServiceButton);
+
 
         return v;
     }
@@ -73,7 +73,7 @@ public class StartupFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.action_settings){
+        if (item.getItemId() == R.id.action_settings) {
             parent.settingsMenu();
             return true;
         } else {
@@ -83,7 +83,10 @@ public class StartupFragment extends Fragment {
 
     interface FragmentInteractionInterface {
         void startService();
+
         void stopService();
+
         void settingsMenu();
+
     }
 }

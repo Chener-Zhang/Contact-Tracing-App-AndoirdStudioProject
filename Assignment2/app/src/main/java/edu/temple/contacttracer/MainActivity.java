@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity implements StartupFragment.F
     Intent serviceIntent;
     UUIDContainer uuidContainer;
 
-
+    //Create a BroadcastReceiver
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -32,12 +32,15 @@ public class MainActivity extends AppCompatActivity implements StartupFragment.F
         }
     };
 
+    //Create intentfilter
     IntentFilter intentFilter;
+
+    //Test_serviceintent
+    Intent test_service_intent;
 
     @Override
     protected void onResume() {
         super.onResume();
-
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, intentFilter);
     }
 
@@ -90,11 +93,11 @@ public class MainActivity extends AppCompatActivity implements StartupFragment.F
                     .commit();
 
 
+
     }
 
     @Override
     public void startService() {
-
         startService(serviceIntent);
     }
 
@@ -119,9 +122,11 @@ public class MainActivity extends AppCompatActivity implements StartupFragment.F
         }
     }
 
+    //UnregisterReceiveer
     @Override
     protected void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
     }
+
 }

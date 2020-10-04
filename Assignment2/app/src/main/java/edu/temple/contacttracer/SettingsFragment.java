@@ -63,12 +63,12 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(Constants.PREF_KEY_CONTACT_TIME)) {
-            int distance = Integer.parseInt(((EditTextPreference)findPreference(key)).getText());
+            int distance = Integer.parseInt(((EditTextPreference) findPreference(key)).getText());
             if (distance < 1 || distance > 10) { // Those values really shouldn't be literals, but it's late
                 Toast.makeText(getActivity(), "Invalid time - Using default", Toast.LENGTH_SHORT).show();
-                preferences.edit().putString(Constants.PREF_KEY_CONTACT_TIME, String.valueOf(Constants.CONTACT_TIME_DEFAULT)).apply();
-                ((EditTextPreference)findPreference(key)).setText(
-                        String.valueOf(Constants.CONTACT_TIME_DEFAULT)
+                preferences.edit().putString(Constants.PREF_KEY_CONTACT_TIME, Constants.CONTACT_TIME_DEFAULT).apply();
+                ((EditTextPreference) findPreference(key)).setText(
+                        Constants.CONTACT_TIME_DEFAULT
                 );
             }
         }
