@@ -51,13 +51,9 @@ public class FirebaseCloudMessaging extends FirebaseMessagingService {
                     }
                 } catch (Exception e) {
                     Log.d("Error  ", "somebody sending something else than regular information");
-                    Log.d("Error  ",e.toString());
+                    Log.d("Error  ", e.toString());
                 }
 
-
-//                Log.d("get others long", other_sedentary_begin+"");
-//                long difference = other_sedentary_end - other_sedentary_begin;
-//                Log.d("TRACING_DIFFERENCE",difference+"");
 
                 System.out.println(jsonObject.toString());
             } catch (JSONException e) {
@@ -66,8 +62,8 @@ public class FirebaseCloudMessaging extends FirebaseMessagingService {
         }
 
         Intent message_from_FCM = new Intent(getPackageName() + ".CHAT_MESSAGE");
-        message_from_FCM.putExtra("json_file", json);
-        message_from_FCM.putExtra("mylocaiton", mylocation);
+        message_from_FCM.putExtra(CONSTANT.JSON_FROM_BROADCAST, json);
+        message_from_FCM.putExtra(CONSTANT.MYLOCATION, mylocation);
 
         LocalBroadcastManager.getInstance(this).sendBroadcast(message_from_FCM);
 

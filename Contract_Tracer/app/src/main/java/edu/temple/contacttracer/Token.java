@@ -30,8 +30,7 @@ public class Token {
     }
 
     public LocalDate getDate() {
-        LocalDate date = LocalDate.now();
-        return date;
+        return LocalDate.now();
     }
 
     public String toString() {
