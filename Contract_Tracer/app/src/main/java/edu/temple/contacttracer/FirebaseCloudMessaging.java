@@ -47,7 +47,7 @@ public class FirebaseCloudMessaging extends FirebaseMessagingService {
                         Log.d("Get the location ", mylocation);
                     } else {
                         mylocation = "mylocation not list here";
-                        Log.d("Mylocation", mylocation);
+//                        Log.d("Mylocation", mylocation);
                     }
                 } catch (Exception e) {
                     Log.d("Error  ", "somebody sending something else than regular information");
