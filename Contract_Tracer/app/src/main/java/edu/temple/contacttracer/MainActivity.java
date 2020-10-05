@@ -6,6 +6,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
@@ -73,8 +74,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     public long sedentary_begin;
     public long sedentary_end;
 
-
     //URL
+
     public static String url = "https://kamorris.com/lab/ct_tracking.php";
     //Firebase intent
     Intent firebase_intent;
@@ -85,6 +86,41 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
     //Token
     Token_Container token_container;
+
+
+    //Broad Cast Receiver
+    IntentFilter FCM_IntentFilter;
+    BroadcastReceiver FCM_BroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String json = intent.getStringExtra("json_file");
+            Log.d("Main Activity json receive", json);
+        }
+    };
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (broadcastReceiver == null) {
+            broadcastReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    longtitude = (double) intent.getExtras().get(longtitude_key);
+                    latitude = (double) intent.getExtras().get(latitude_key);
+                    sedentary_begin = (long) intent.getExtras().get(sendentary_begin_key);
+                    sedentary_end = (long) intent.getExtras().get(sendentary_end_key);
+
+                    System.out.println("longtitude is  " + longtitude);
+                    System.out.println("latitude is  " + latitude);
+                    System.out.println("begin is  " + sedentary_begin);
+                    System.out.println("end is  " + sedentary_end);
+
+                }
+            };
+        }
+        registerReceiver(broadcastReceiver, new IntentFilter("location_update"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(FCM_BroadcastReceiver, FCM_IntentFilter);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +148,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
 
+        //FCM Broadcast receiver
+        FCM_IntentFilter = new IntentFilter(getPackageName() + ".CHAT_MESSAGE");
         //Firebase Cloud Messaging
 
         firebase_intent = new Intent(this, FirebaseCloudMessaging.class);
@@ -187,8 +225,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             unregisterReceiver(broadcastReceiver);
         }
     }
-
     //Call back of permission result;
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
@@ -199,8 +237,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             permission_checking();
         }
     }
-
     //Return true if pass checking false if not
+
     public boolean permission_checking() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return false;
@@ -301,33 +339,11 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     }
 
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (broadcastReceiver == null) {
-            broadcastReceiver = new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    longtitude = (double) intent.getExtras().get(longtitude_key);
-                    latitude = (double) intent.getExtras().get(latitude_key);
-                    sedentary_begin = (long) intent.getExtras().get(sendentary_begin_key);
-                    sedentary_end = (long) intent.getExtras().get(sendentary_end_key);
-
-                    System.out.println("longtitude is  " + longtitude);
-                    System.out.println("latitude is  " + latitude);
-                    System.out.println("begin is  " + sedentary_begin);
-                    System.out.println("end is  " + sedentary_end);
-
-                }
-            };
-        }
-        registerReceiver(broadcastReceiver, new IntentFilter("location_update"));
-    }
-
 
     @Override
     protected void onPause() {
         super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(FCM_BroadcastReceiver);
     }
 
 }
