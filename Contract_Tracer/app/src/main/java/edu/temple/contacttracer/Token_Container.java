@@ -1,7 +1,12 @@
 package edu.temple.contacttracer;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.util.Log;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
@@ -16,8 +21,8 @@ public class Token_Container {
         tokenArrayList.add(token);
     }
 
-    public void remove() {
-        tokenArrayList.remove(0);
+    public void remove(Token token) {
+        tokenArrayList.remove(token);
     }
 
     public void clear() {
@@ -27,7 +32,7 @@ public class Token_Container {
     public void remove_expire(Token token) {
         LocalDate today = LocalDate.now();
         if (DAYS.between(token.getDate(), today) > 14) {
-            remove();
+            remove(token);
         }
     }
 
@@ -37,5 +42,17 @@ public class Token_Container {
         }
     }
 
+    public String print() {
+        String print = "";
+        if (tokenArrayList.isEmpty()) {
+            Log.d("ERROR", "EMPTY");
+            print = "null";
+        } else {
+            for (Token token : tokenArrayList) {
+                print += token.toString();
+            }
+        }
+        return print;
+    }
 
 }

@@ -25,8 +25,6 @@ public class Token {
         this.longtitude = longtitude;
         this.sedentary_begin = sedentary_begin;
         this.sedentary_end = sedentary_end;
-
-        Log.d("UUID : DATA : LATITUDE : LONGTITUDE : SEDENTARY_BEGIN : SEDENTARY_END", String.valueOf(this.UUID) + this.date + this.latitude + this.longtitude + this.sedentary_begin + this.sedentary_end);
     }
 
     public int Token_generator() {

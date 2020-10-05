@@ -34,8 +34,13 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -85,8 +90,10 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
 
     //Token
-    Token_Container token_container;
-
+    Token_Container temporary_token_container;
+    Token_Container current_token_container;
+    //Gson
+    Gson gson;
 
     //Broad Cast Receiver
     IntentFilter FCM_IntentFilter;
@@ -132,8 +139,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         editor = sharedpreferences.edit();
 
         //token container
-        token_container = new Token_Container();
-
+        temporary_token_container = new Token_Container();
+        current_token_container = new Token_Container();
 
         //toolbar init
         toolbar = findViewById(R.id.my_toolbar);
@@ -147,6 +154,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
+        //Gson
+        gson = new Gson();
 
         //FCM Broadcast receiver
         FCM_IntentFilter = new IntentFilter(getPackageName() + ".CHAT_MESSAGE");
@@ -225,6 +234,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             unregisterReceiver(broadcastReceiver);
         }
     }
+
     //Call back of permission result;
 
     @Override
@@ -237,8 +247,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             permission_checking();
         }
     }
-    //Return true if pass checking false if not
 
+    //Return true if pass checking false if not
     public boolean permission_checking() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return false;
@@ -254,6 +264,18 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         userinput_time = time;
     }
 
+    public void list_retrieve() {
+        String json = sharedpreferences.getString("tojson", null);
+        current_token_container = gson.fromJson(json, Token_Container.class);
+        try {
+            current_token_container.expire_days_checker();
+            System.out.println("list retrieve : " + current_token_container.print());
+
+        } catch (Exception e) {
+            System.out.println("it is empty");
+        }
+    }
+
     public void button_init() {
         start_button = (Button) findViewById(R.id.start_button);
         stop_button = (Button) findViewById(R.id.stop_button);
@@ -264,7 +286,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             public void onClick(View view) {
                 editor.clear();
                 editor.commit();
-                token_container.clear();
+                temporary_token_container.clear();
                 System.out.println("Tokens have been all clear");
             }
         });
@@ -276,7 +298,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                 Log.d("La", String.valueOf(longtitude));
 
                 Token token = new Token(latitude, longtitude, sedentary_begin, sedentary_end);
-                token_container.add(token);
+                temporary_token_container.add(token);
+
 
                 String latitude_to_string = String.valueOf(latitude);
                 String longtitude_to_string = String.valueOf(longtitude);
@@ -289,7 +312,11 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                 editor.putString("longtitude", longtitude_to_string);
                 editor.putString("sedentary_begin ", sedentary_begin_to_string);
                 editor.putString("sedentary_end ", sedentary_end_to_string);
+
+                String json = gson.toJson(temporary_token_container);
+                editor.putString("tojson", json);
                 editor.commit();
+
 
             }
         });
@@ -298,7 +325,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         Get_token.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                System.out.println(sharedpreferences.getAll());
+                System.out.println(sharedpreferences.getAll() + "\n\n\n");
+                list_retrieve();
             }
         });
 
@@ -337,7 +365,6 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         fragmentTransaction.commit();
 
     }
-
 
 
     @Override
