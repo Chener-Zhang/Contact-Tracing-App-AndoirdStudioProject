@@ -82,6 +82,10 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     SharedPreferences sharedpreferences;
     SharedPreferences.Editor editor;
 
+
+    //Token
+    Token_Container token_container;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,6 +94,10 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         //init the share preference
         sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         editor = sharedpreferences.edit();
+
+        //token container
+        token_container = new Token_Container();
+
 
         //toolbar init
         toolbar = findViewById(R.id.my_toolbar);
@@ -218,6 +226,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             public void onClick(View view) {
                 editor.clear();
                 editor.commit();
+                token_container.clear();
                 System.out.println("Tokens have been all clear");
             }
         });
@@ -227,7 +236,9 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                 Log.d("button", "trigger");
                 Log.d("Long", String.valueOf(longtitude));
                 Log.d("La", String.valueOf(longtitude));
+
                 Token token = new Token(latitude, longtitude, sedentary_begin, sedentary_end);
+                token_container.add(token);
 
                 String latitude_to_string = String.valueOf(latitude);
                 String longtitude_to_string = String.valueOf(longtitude);

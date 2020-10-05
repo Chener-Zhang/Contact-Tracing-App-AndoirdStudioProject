@@ -33,6 +33,8 @@ public class FirebaseCloudMessaging extends FirebaseMessagingService {
                 Log.d("FCM Data: ", json);
                 JSONObject jsonObject = new JSONObject(json);
                 System.out.println(jsonObject.toString());
+
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
