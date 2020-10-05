@@ -95,39 +95,19 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     //Gson
     Gson gson;
 
+    //My location
+    String mylocation;
     //Broad Cast Receiver
     IntentFilter FCM_IntentFilter;
     BroadcastReceiver FCM_BroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String json = intent.getStringExtra("json_file");
+            mylocation = intent.getStringExtra("mylocaiton");
             Log.d("Main Activity json receive", json);
+
         }
     };
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (broadcastReceiver == null) {
-            broadcastReceiver = new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    longtitude = (double) intent.getExtras().get(longtitude_key);
-                    latitude = (double) intent.getExtras().get(latitude_key);
-                    sedentary_begin = (long) intent.getExtras().get(sendentary_begin_key);
-                    sedentary_end = (long) intent.getExtras().get(sendentary_end_key);
-
-                    System.out.println("longtitude is  " + longtitude);
-                    System.out.println("latitude is  " + latitude);
-                    System.out.println("begin is  " + sedentary_begin);
-                    System.out.println("end is  " + sedentary_end);
-
-                }
-            };
-        }
-        registerReceiver(broadcastReceiver, new IntentFilter("location_update"));
-        LocalBroadcastManager.getInstance(this).registerReceiver(FCM_BroadcastReceiver, FCM_IntentFilter);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -181,36 +161,31 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                     }
                 });
 
-        //POST REQUEST BEGIN
-        RequestQueue postqueue = Volley.newRequestQueue(this);
-        StringRequest postquest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        System.out.println("response from post request " + response);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                System.out.println("get the VolleyError " + error.toString());
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
 
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("uuid", "test");
-                params.put("latitude", "test");
-                params.put("longitude", "test");
-                params.put("sedentary_begin", "test");
-                params.put("sedentary_end", "test");
-                return params;
+    }
 
-            }
-        };
-        postqueue.add(postquest);
-        //POST REQUEST END
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (broadcastReceiver == null) {
+            broadcastReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    longtitude = (double) intent.getExtras().get(longtitude_key);
+                    latitude = (double) intent.getExtras().get(latitude_key);
+                    sedentary_begin = (long) intent.getExtras().get(sendentary_begin_key);
+                    sedentary_end = (long) intent.getExtras().get(sendentary_end_key);
+                    send_post_request();
+                    System.out.println("longtitude is  " + longtitude);
+                    System.out.println("latitude is  " + latitude);
+                    System.out.println("begin is  " + sedentary_begin);
+                    System.out.println("end is  " + sedentary_end);
 
+                }
+            };
+        }
+        registerReceiver(broadcastReceiver, new IntentFilter("location_update"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(FCM_BroadcastReceiver, FCM_IntentFilter);
     }
 
     @Override
@@ -373,4 +348,39 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(FCM_BroadcastReceiver);
     }
 
+    public void send_post_request() {
+
+        //POST REQUEST BEGIN
+        RequestQueue postqueue = Volley.newRequestQueue(this);
+        StringRequest postquest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        System.out.println("response from post request " + response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.out.println("get the VolleyError " + error.toString());
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("uuid", "test");
+                params.put("latitude", "test");
+                params.put("longitude", "test");
+                params.put("sedentary_begin", "test");
+                params.put("sedentary_end", "test");
+                return params;
+
+            }
+        };
+        postqueue.add(postquest);
+        //POST REQUEST END
+    }
+
+
 }
+
