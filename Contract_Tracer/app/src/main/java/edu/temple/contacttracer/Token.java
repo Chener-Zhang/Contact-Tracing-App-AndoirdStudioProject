@@ -34,7 +34,7 @@ public class Token {
     }
 
     public String toString() {
-        return this.UUID + "\n" + getDate() + "\n" + this.latitude + "\n" + this.longtitude + "\n" + this.sedentary_begin + "\n" + this.sedentary_end;
+        return "UUID : " + this.UUID + "\n" + "DATE : " + getDate() + "\n" + "La : " + this.latitude + "\n" + "Lo : " + this.longtitude + "\n" + "sedentary_begin : " + this.sedentary_begin + "\n" + "sedentary_end : " + this.sedentary_end + "\n\n\n";
     }
 
 
