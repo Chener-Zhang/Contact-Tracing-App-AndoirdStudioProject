@@ -132,24 +132,25 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.d("Response from post request \n", response);
+                        System.out.println("response from post request " + response);
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
-                Log.d("onErrorResponse", error.toString());
+                System.out.println("get the VolleyError " + error.toString());
             }
         }) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
+
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("uuid", "chener");
-                params.put("latitude", sharedpreferences.getString("latitude", ""));
-                params.put("longitude", sharedpreferences.getString("longtitude", ""));
-                params.put("sedentary_begin", sharedpreferences.getString("sedentary_begin", ""));
-                params.put("sedentary_end", sharedpreferences.getString("sedentary_end", ""));
+                params.put("uuid", "test");
+                params.put("latitude", "test");
+                params.put("longitude", "test");
+                params.put("sedentary_begin", "test");
+                params.put("sedentary_end", "test");
                 return params;
+
             }
         };
         postqueue.add(postquest);
@@ -240,6 +241,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                 editor.putString("sedentary_begin ", sedentary_begin_to_string);
                 editor.putString("sedentary_end ", sedentary_end_to_string);
                 editor.commit();
+
             }
         });
 

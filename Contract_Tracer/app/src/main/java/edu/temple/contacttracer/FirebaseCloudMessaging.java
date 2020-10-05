@@ -32,7 +32,7 @@ public class FirebaseCloudMessaging extends FirebaseMessagingService {
             try {
                 Log.d("FCM Data: ", json);
                 JSONObject jsonObject = new JSONObject(json);
-                System.out.println("the uuid is " + jsonObject.get("uuid"));
+                System.out.println(jsonObject.toString());
             } catch (JSONException e) {
                 e.printStackTrace();
             }
