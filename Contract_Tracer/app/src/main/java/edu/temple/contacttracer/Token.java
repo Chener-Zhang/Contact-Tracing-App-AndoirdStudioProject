@@ -8,15 +8,13 @@ import java.time.LocalDateTime;
 
 
 public class Token {
-    public int UUID;
+    public String UUID;
     public LocalDate date;
     public double latitude;
     public double longtitude;
     public long sedentary_begin;
     public long sedentary_end;
 
-    public static int min = 0;
-    public static int max = 1000;
 
     public Token(double latitude, double longtitude, long sedentary_begin, long sedentary_end) {
         this.UUID = Token_generator();
@@ -27,9 +25,8 @@ public class Token {
         this.sedentary_end = sedentary_end;
     }
 
-    public int Token_generator() {
-        int random_int = (int) (Math.random() * (max - min + 1) + min);
-        return random_int;
+    public String Token_generator() {
+        return "tuh12085";
     }
 
     public LocalDate getDate() {
