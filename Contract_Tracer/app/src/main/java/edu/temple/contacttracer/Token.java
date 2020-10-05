@@ -3,12 +3,13 @@ package edu.temple.contacttracer;
 
 import android.util.Log;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
 public class Token {
     public int UUID;
-    public LocalDateTime date;
+    public LocalDate date;
     public double latitude;
     public double longtitude;
     public long sedentary_begin;
@@ -33,8 +34,8 @@ public class Token {
         return random_int;
     }
 
-    public LocalDateTime getDate() {
-        LocalDateTime date = java.time.LocalDateTime.now();
+    public LocalDate getDate() {
+        LocalDate date = LocalDate.now();
         return date;
     }
 
