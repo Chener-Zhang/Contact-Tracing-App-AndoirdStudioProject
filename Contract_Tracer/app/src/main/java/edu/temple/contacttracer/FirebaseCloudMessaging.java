@@ -16,6 +16,8 @@ import org.json.JSONObject;
 public class FirebaseCloudMessaging extends FirebaseMessagingService {
 
 
+    public String mylocation;
+
     @Override
     public void onNewToken(@NonNull String s) {
         Log.d("FCM Notification", s);
@@ -27,6 +29,7 @@ public class FirebaseCloudMessaging extends FirebaseMessagingService {
         String json = remoteMessage.getData().get("payload");
         if (remoteMessage.getNotification() != null) {
             Log.d("RemoteMessage not equal to null FCM Notification", remoteMessage.getNotification().getBody());
+
         } else {
             try {
                 Log.d("FCM Data: ", json);
@@ -39,6 +42,13 @@ public class FirebaseCloudMessaging extends FirebaseMessagingService {
                     long other_sedentary_begin = Long.parseLong(jsonObject.getString("sedentary_begin"));
                     long other_sedentary_end = Long.parseLong(jsonObject.getString("sedentary_end"));
 
+                    if (other_uuid == "tuh12085") {
+                        mylocation = json;
+                        Log.d("Get the location ", mylocation);
+                    } else {
+                        mylocation = "mylocation not list here";
+                        Log.d("Mylocation", mylocation);
+                    }
                 } catch (Exception e) {
                     Log.d("Error  ", "somebody sending something else than regular information");
                     Log.d("Error  ",e.toString());
@@ -57,6 +67,8 @@ public class FirebaseCloudMessaging extends FirebaseMessagingService {
 
         Intent message_from_FCM = new Intent(getPackageName() + ".CHAT_MESSAGE");
         message_from_FCM.putExtra("json_file", json);
+        message_from_FCM.putExtra("mylocaiton", mylocation);
+
         LocalBroadcastManager.getInstance(this).sendBroadcast(message_from_FCM);
 
     }
