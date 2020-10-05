@@ -22,11 +22,6 @@ import androidx.core.app.NotificationManagerCompat;
 import edu.temple.contacttracer.R;
 
 public class Location_Service extends Service {
-    //key declaration
-    public static String longtitude_key = "long_key";
-    public static String latitude_key = "lat_key";
-    public static String sendentary_begin_key = "sendentary_begin_key";
-    public static String sendentary_end_key = "sendentary_end_key";
 
     //Location component
     public LocationManager locationManager;
@@ -67,7 +62,7 @@ public class Location_Service extends Service {
 
         long time = Long.parseLong(Sedentary_time);
         float distance = Float.parseFloat(Tracing_distance);
-        System.out.println(" long time : " + time + " float distance : " + distance);
+
 
         locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, time, distance, locationListener);
@@ -99,10 +94,10 @@ public class Location_Service extends Service {
                 longtitude = location.getLongitude();
                 latitude = location.getLatitude();
 
-                i.putExtra(longtitude_key, latitude);
-                i.putExtra(latitude_key, latitude);
-                i.putExtra(sendentary_begin_key, sedentary_begin);
-                i.putExtra(sendentary_end_key, sedentary_end);
+                i.putExtra(CONSTANT.LONGTITUDE_KEY, longtitude);
+                i.putExtra(CONSTANT.LATITUDE_KEY, latitude);
+                i.putExtra(CONSTANT.SENDENTARY_BEGIN_KEY, sedentary_begin);
+                i.putExtra(CONSTANT.SENDENTARY_END_KEY, sedentary_end);
 
                 //send broadcast
                 sendBroadcast(i);

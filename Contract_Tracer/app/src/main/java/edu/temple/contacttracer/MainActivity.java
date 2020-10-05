@@ -35,13 +35,11 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+
+import static edu.temple.contacttracer.CONSTANT.MyPREFERENCES;
 
 
 public class MainActivity extends AppCompatActivity implements value_sender {
@@ -51,14 +49,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     public Button stop_button;
     public Button token_generator;
     public Button clear_button;
-    //Share preference
-    public static final String MyPREFERENCES = "MyPrefs";
 
-    //Key
-    public static String longtitude_key = "long_key";
-    public static String latitude_key = "lat_key";
-    public static String sendentary_begin_key = "sendentary_begin_key";
-    public static String sendentary_end_key = "sendentary_end_key";
 
     //User input declaration
     public String userinput_distance;
@@ -103,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         @Override
         public void onReceive(Context context, Intent intent) {
             String json = intent.getStringExtra("json_file");
-            mylocation = intent.getStringExtra("mylocaiton");
+            mylocation = intent.getStringExtra(CONSTANT.MYLOCATION);
             Log.d("Main Activity json receive", json);
 
         }
@@ -171,16 +162,11 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             broadcastReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
-                    longtitude = (double) intent.getExtras().get(longtitude_key);
-                    latitude = (double) intent.getExtras().get(latitude_key);
-                    sedentary_begin = (long) intent.getExtras().get(sendentary_begin_key);
-                    sedentary_end = (long) intent.getExtras().get(sendentary_end_key);
+                    longtitude = (double) intent.getExtras().get(CONSTANT.LONGTITUDE_KEY);
+                    latitude = (double) intent.getExtras().get(CONSTANT.LATITUDE_KEY);
+                    sedentary_begin = (long) intent.getExtras().get(CONSTANT.SENDENTARY_BEGIN_KEY);
+                    sedentary_end = (long) intent.getExtras().get(CONSTANT.SENDENTARY_END_KEY);
                     send_post_request();
-                    System.out.println("longtitude is  " + longtitude);
-                    System.out.println("latitude is  " + latitude);
-                    System.out.println("begin is  " + sedentary_begin);
-                    System.out.println("end is  " + sedentary_end);
-
                 }
             };
         }
@@ -276,20 +262,21 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                 temporary_token_container.add(token);
 
 
-                String latitude_to_string = String.valueOf(latitude);
-                String longtitude_to_string = String.valueOf(longtitude);
-                String sedentary_begin_to_string = Long.valueOf(sedentary_begin).toString();
-                String sedentary_end_to_string = Long.valueOf(sedentary_end).toString();
-
-
-                editor.putString("uuid", String.valueOf(token.UUID));
-                editor.putString("latitude", latitude_to_string);
-                editor.putString("longtitude", longtitude_to_string);
-                editor.putString("sedentary_begin ", sedentary_begin_to_string);
-                editor.putString("sedentary_end ", sedentary_end_to_string);
+//                String latitude_to_string = String.valueOf(latitude);
+//                String longtitude_to_string = String.valueOf(longtitude);
+//                String sedentary_begin_to_string = Long.valueOf(sedentary_begin).toString();
+//                String sedentary_end_to_string = Long.valueOf(sedentary_end).toString();
+//                String data_to_string = token.getDate().toString();
+//
+//                editor.putString(CONSTANT.UUID, String.valueOf(token.UUID));
+//                editor.putString(CONSTANT.LATITUDE, latitude_to_string);
+//                editor.putString(CONSTANT.LONGTITUDE, longtitude_to_string);
+//                editor.putString(CONSTANT.SEDENTARY_BEGIN, sedentary_begin_to_string);
+//                editor.putString(CONSTANT.SEDENTARY_END, sedentary_end_to_string);
+//                editor.putString(CONSTANT.DATE, data_to_string);
 
                 String json = gson.toJson(temporary_token_container);
-                editor.putString("tojson", json);
+                editor.putString(CONSTANT.TO_JSON, json);
                 editor.commit();
 
 
@@ -300,7 +287,6 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         Get_token.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                System.out.println(sharedpreferences.getAll() + "\n\n\n");
                 list_retrieve();
             }
         });
@@ -368,11 +354,11 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             protected Map<String, String> getParams() throws AuthFailureError {
 
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("uuid", "test");
-                params.put("latitude", "test");
-                params.put("longitude", "test");
-                params.put("sedentary_begin", "test");
-                params.put("sedentary_end", "test");
+                params.put(CONSTANT.UUID, "tuh12085");
+                params.put(CONSTANT.LATITUDE, String.valueOf(latitude));
+                params.put(CONSTANT.LONGTITUDE, String.valueOf(longtitude));
+                params.put(CONSTANT.SEDENTARY_BEGIN, String.valueOf(sedentary_begin));
+                params.put(CONSTANT.SEDENTARY_END, String.valueOf(sedentary_end));
                 return params;
 
             }
