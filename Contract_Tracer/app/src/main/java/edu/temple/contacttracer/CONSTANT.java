@@ -24,4 +24,5 @@ public class CONSTANT {
     public static final String DATE = "date";
 
     public static final String MY_UUID = "tuh12085";
+    public static final String STOP_MOVING = "stop_moving";
 }

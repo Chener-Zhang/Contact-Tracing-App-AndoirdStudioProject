@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static edu.temple.contacttracer.CONSTANT.MyPREFERENCES;
+import static edu.temple.contacttracer.CONSTANT.STOP_MOVING;
 
 
 public class MainActivity extends AppCompatActivity implements value_sender {
@@ -85,7 +86,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     Token_Container current_token_container;
     //Gson
     Gson gson;
-
+    //Spinner
+    public boolean stop_moving;
     //My location
     String mylocation;
     //Broad Cast Receiver
@@ -133,6 +135,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         //Firebase Cloud Messaging
 
         firebase_intent = new Intent(this, FirebaseCloudMessaging.class);
+
+
         FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
             @Override
             public void onComplete(@NonNull Task<InstanceIdResult> task) {
@@ -166,7 +170,11 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                     latitude = (double) intent.getExtras().get(CONSTANT.LATITUDE_KEY);
                     sedentary_begin = (long) intent.getExtras().get(CONSTANT.SENDENTARY_BEGIN_KEY);
                     sedentary_end = (long) intent.getExtras().get(CONSTANT.SENDENTARY_END_KEY);
-                    send_post_request();
+                    stop_moving = (boolean) intent.getExtras().get(CONSTANT.STOP_MOVING);
+                    Log.d(CONSTANT.STOP_MOVING, stop_moving + "");
+                    if (stop_moving) {
+                        send_post_request();
+                    }
                 }
             };
         }
@@ -260,20 +268,6 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
                 Token token = new Token(latitude, longtitude, sedentary_begin, sedentary_end);
                 temporary_token_container.add(token);
-
-
-//                String latitude_to_string = String.valueOf(latitude);
-//                String longtitude_to_string = String.valueOf(longtitude);
-//                String sedentary_begin_to_string = Long.valueOf(sedentary_begin).toString();
-//                String sedentary_end_to_string = Long.valueOf(sedentary_end).toString();
-//                String data_to_string = token.getDate().toString();
-//
-//                editor.putString(CONSTANT.UUID, String.valueOf(token.UUID));
-//                editor.putString(CONSTANT.LATITUDE, latitude_to_string);
-//                editor.putString(CONSTANT.LONGTITUDE, longtitude_to_string);
-//                editor.putString(CONSTANT.SEDENTARY_BEGIN, sedentary_begin_to_string);
-//                editor.putString(CONSTANT.SEDENTARY_END, sedentary_end_to_string);
-//                editor.putString(CONSTANT.DATE, data_to_string);
 
                 String json = gson.toJson(temporary_token_container);
                 editor.putString(CONSTANT.TO_JSON, json);

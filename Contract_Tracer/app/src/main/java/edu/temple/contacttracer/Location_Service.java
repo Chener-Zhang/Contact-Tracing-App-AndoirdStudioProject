@@ -19,8 +19,6 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
-import edu.temple.contacttracer.R;
-
 public class Location_Service extends Service {
 
     //Location component
@@ -44,6 +42,9 @@ public class Location_Service extends Service {
     public long sedentary_end;
     //Location change
     Location last_location;
+
+    //isMoving
+    public boolean stop_moving = false;
 
     @Nullable
     @Override
@@ -99,9 +100,20 @@ public class Location_Service extends Service {
                 i.putExtra(CONSTANT.SENDENTARY_BEGIN_KEY, sedentary_begin);
                 i.putExtra(CONSTANT.SENDENTARY_END_KEY, sedentary_end);
 
+                System.out.println("Last location time : " + last_location.getTime());
+                System.out.println("Time equal " + (location.getTime() - last_location.getTime()));
+                System.out.println("Time equal " + (Integer.parseInt(String.valueOf(Sedentary_time))));
+
+                if (location.getTime() - last_location.getTime() >= (Integer.parseInt(String.valueOf(Sedentary_time))) && last_location.getLatitude() == location.getLatitude() && last_location.getLongitude() == location.getLongitude()) {
+                    stop_moving = true;
+                }
+
+                i.putExtra(CONSTANT.STOP_MOVING, stop_moving);
+
                 //send broadcast
                 sendBroadcast(i);
-
+                stop_moving = false;
+                last_location = location;
                 //build notification
                 Notification_builder();
             }
