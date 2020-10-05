@@ -1,6 +1,8 @@
 package edu.temple.contacttracer;
 
 public class CONSTANT {
+
+
     //Key
     public static final String LONGTITUDE_KEY = "long_key";
     public static final String LATITUDE_KEY = "lat_key";
@@ -19,6 +21,7 @@ public class CONSTANT {
 
 
     public static final String TO_JSON = "tojson";
-
     public static final String DATE = "date";
+
+    public static final String MY_UUID = "tuh12085";
 }

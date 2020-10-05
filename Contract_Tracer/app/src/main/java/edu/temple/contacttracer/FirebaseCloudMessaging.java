@@ -36,13 +36,13 @@ public class FirebaseCloudMessaging extends FirebaseMessagingService {
                 JSONObject jsonObject = new JSONObject(json);
 
                 try {
-                    String other_uuid = jsonObject.getString("uuid");
-                    double other_latitude = Double.parseDouble(jsonObject.getString("latitude"));
-                    double other_longtitude = Double.parseDouble(jsonObject.getString("longtitude"));
-                    long other_sedentary_begin = Long.parseLong(jsonObject.getString("sedentary_begin"));
-                    long other_sedentary_end = Long.parseLong(jsonObject.getString("sedentary_end"));
+                    String other_uuid = jsonObject.getString(CONSTANT.UUID);
+                    double other_latitude = Double.parseDouble(jsonObject.getString(CONSTANT.LATITUDE));
+                    double other_longtitude = Double.parseDouble(jsonObject.getString(CONSTANT.LONGTITUDE));
+                    long other_sedentary_begin = Long.parseLong(jsonObject.getString(CONSTANT.SEDENTARY_BEGIN));
+                    long other_sedentary_end = Long.parseLong(jsonObject.getString(CONSTANT.SEDENTARY_END));
 
-                    if (other_uuid == "tuh12085") {
+                    if (other_uuid == CONSTANT.MY_UUID) {
                         mylocation = json;
                         Log.d("Get the location ", mylocation);
                     } else {

@@ -167,11 +167,6 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                     sedentary_begin = (long) intent.getExtras().get(CONSTANT.SENDENTARY_BEGIN_KEY);
                     sedentary_end = (long) intent.getExtras().get(CONSTANT.SENDENTARY_END_KEY);
                     send_post_request();
-                    System.out.println("longtitude is  " + longtitude);
-                    System.out.println("latitude is  " + latitude);
-                    System.out.println("begin is  " + sedentary_begin);
-                    System.out.println("end is  " + sedentary_end);
-
                 }
             };
         }
@@ -267,19 +262,18 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                 temporary_token_container.add(token);
 
 
-                String latitude_to_string = String.valueOf(latitude);
-                String longtitude_to_string = String.valueOf(longtitude);
-                String sedentary_begin_to_string = Long.valueOf(sedentary_begin).toString();
-                String sedentary_end_to_string = Long.valueOf(sedentary_end).toString();
-                String data_to_string = token.getDate().toString();
-
-
-                editor.putString(CONSTANT.UUID, String.valueOf(token.UUID));
-                editor.putString(CONSTANT.LATITUDE, latitude_to_string);
-                editor.putString(CONSTANT.LONGTITUDE, longtitude_to_string);
-                editor.putString(CONSTANT.SEDENTARY_BEGIN, sedentary_begin_to_string);
-                editor.putString(CONSTANT.SEDENTARY_END, sedentary_end_to_string);
-                editor.putString(CONSTANT.DATE, data_to_string);
+//                String latitude_to_string = String.valueOf(latitude);
+//                String longtitude_to_string = String.valueOf(longtitude);
+//                String sedentary_begin_to_string = Long.valueOf(sedentary_begin).toString();
+//                String sedentary_end_to_string = Long.valueOf(sedentary_end).toString();
+//                String data_to_string = token.getDate().toString();
+//
+//                editor.putString(CONSTANT.UUID, String.valueOf(token.UUID));
+//                editor.putString(CONSTANT.LATITUDE, latitude_to_string);
+//                editor.putString(CONSTANT.LONGTITUDE, longtitude_to_string);
+//                editor.putString(CONSTANT.SEDENTARY_BEGIN, sedentary_begin_to_string);
+//                editor.putString(CONSTANT.SEDENTARY_END, sedentary_end_to_string);
+//                editor.putString(CONSTANT.DATE, data_to_string);
 
                 String json = gson.toJson(temporary_token_container);
                 editor.putString(CONSTANT.TO_JSON, json);
@@ -293,7 +287,6 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         Get_token.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                System.out.println(sharedpreferences.getAll() + "\n\n\n");
                 list_retrieve();
             }
         });
