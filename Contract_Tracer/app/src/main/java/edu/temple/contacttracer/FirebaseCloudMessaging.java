@@ -31,8 +31,19 @@ public class FirebaseCloudMessaging extends FirebaseMessagingService {
             try {
                 Log.d("FCM Data: ", json);
                 JSONObject jsonObject = new JSONObject(json);
-                long other_sedentary_begin = Long.parseLong(jsonObject.getString("sedentary_begin"));
-                long other_sedentary_end = Long.parseLong(jsonObject.getString("sedentary_end"));
+
+                try {
+                    String other_uuid = jsonObject.getString("uuid");
+                    double other_latitude = Double.parseDouble(jsonObject.getString("latitude"));
+                    double other_longtitude = Double.parseDouble(jsonObject.getString("longtitude"));
+                    long other_sedentary_begin = Long.parseLong(jsonObject.getString("sedentary_begin"));
+                    long other_sedentary_end = Long.parseLong(jsonObject.getString("sedentary_end"));
+
+                } catch (Exception e) {
+                    Log.d("Error  ", "somebody sending something else than regular information");
+                    Log.d("Error  ",e.toString());
+                }
+
 
 //                Log.d("get others long", other_sedentary_begin+"");
 //                long difference = other_sedentary_end - other_sedentary_begin;
