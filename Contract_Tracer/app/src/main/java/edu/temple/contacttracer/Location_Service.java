@@ -37,9 +37,11 @@ public class Location_Service extends Service {
     //Tracing_Distance and Sedentary_time
     public String Tracing_distance;
     public String Sedentary_time;
+
     //Location time
     public long sedentary_begin;
     public long sedentary_end;
+
     //Location change
     Location last_location;
 
@@ -60,14 +62,11 @@ public class Location_Service extends Service {
         Tracing_distance = intent.getStringExtra("distance");
         Sedentary_time = intent.getStringExtra("time");
 
-
         long time = Long.parseLong(Sedentary_time);
         float distance = Float.parseFloat(Tracing_distance);
 
-
         locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, time, distance, locationListener);
-
 
         return START_STICKY;
 
@@ -88,7 +87,6 @@ public class Location_Service extends Service {
                 } else {
                     last_location = location;
                 }
-
 
                 Intent i = new Intent("location_update");
 
@@ -111,6 +109,7 @@ public class Location_Service extends Service {
                 sendBroadcast(i);
                 stop_moving = false;
                 last_location = location;
+
                 //build notification
                 Notification_builder();
             }
