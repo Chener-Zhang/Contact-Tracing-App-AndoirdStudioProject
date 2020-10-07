@@ -1,13 +1,11 @@
 package edu.temple.contacttracer;
 
 
-import android.util.Log;
-
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 
 public class Token {
+
     public String UUID;
     public LocalDate date;
     public double latitude;

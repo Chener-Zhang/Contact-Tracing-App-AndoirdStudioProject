@@ -1,12 +1,9 @@
 package edu.temple.contacttracer;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.Log;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
