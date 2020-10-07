@@ -39,8 +39,7 @@ import com.google.gson.Gson;
 import java.util.HashMap;
 import java.util.Map;
 
-import static edu.temple.contacttracer.CONSTANT.MyPREFERENCES;
-import static edu.temple.contacttracer.CONSTANT.STOP_MOVING;
+
 
 
 public class MainActivity extends AppCompatActivity implements value_sender {
@@ -108,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         setContentView(R.layout.activity_main);
 
         //init the share preference
-        sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        sharedpreferences = getSharedPreferences(CONSTANT.MyPREFERENCES, Context.MODE_PRIVATE);
         editor = sharedpreferences.edit();
 
         //token container
