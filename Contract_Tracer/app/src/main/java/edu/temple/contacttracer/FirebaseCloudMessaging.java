@@ -26,7 +26,10 @@ public class FirebaseCloudMessaging extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
+
+        //Get datas
         String json = remoteMessage.getData().get("payload");
+
         if (remoteMessage.getNotification() != null) {
             Log.d("RemoteMessage not equal to null FCM Notification", remoteMessage.getNotification().getBody());
 
@@ -42,18 +45,19 @@ public class FirebaseCloudMessaging extends FirebaseMessagingService {
                     long other_sedentary_begin = Long.parseLong(jsonObject.getString(CONSTANT.SEDENTARY_BEGIN));
                     long other_sedentary_end = Long.parseLong(jsonObject.getString(CONSTANT.SEDENTARY_END));
 
+                    //Check with if uuid is my from the server
                     if (other_uuid == CONSTANT.MY_UUID) {
                         mylocation = json;
-                        Log.d("Get the location ", mylocation);
+                        Log.d("other_uuid == CONSTANT.MY_UUID", mylocation);
                     } else {
                         mylocation = "mylocation not list here";
-//                        Log.d("Mylocation", mylocation);
                     }
+
+
                 } catch (Exception e) {
-                    Log.d("Error  ", "somebody sending something else than regular information");
+                    Log.d("Error  ", "Somebody sending something else than REGULAR imformation");
                     Log.d("Error  ", e.toString());
                 }
-
 
                 System.out.println(jsonObject.toString());
             } catch (JSONException e) {
@@ -61,10 +65,12 @@ public class FirebaseCloudMessaging extends FirebaseMessagingService {
             }
         }
 
+
         Intent message_from_FCM = new Intent(getPackageName() + ".CHAT_MESSAGE");
+        //PASS THE DATA TO INTENT
         message_from_FCM.putExtra(CONSTANT.JSON_FROM_BROADCAST, json);
         message_from_FCM.putExtra(CONSTANT.MYLOCATION, mylocation);
-
+        //SEND THE BROAD CASE
         LocalBroadcastManager.getInstance(this).sendBroadcast(message_from_FCM);
 
     }
