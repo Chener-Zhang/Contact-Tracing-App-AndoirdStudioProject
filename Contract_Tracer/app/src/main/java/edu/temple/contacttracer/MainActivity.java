@@ -1,13 +1,5 @@
 package edu.temple.contacttracer;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -21,6 +13,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -39,9 +39,6 @@ import com.google.gson.Gson;
 import java.util.HashMap;
 import java.util.Map;
 
-import static edu.temple.contacttracer.CONSTANT.MyPREFERENCES;
-import static edu.temple.contacttracer.CONSTANT.STOP_MOVING;
-
 
 public class MainActivity extends AppCompatActivity implements value_sender {
 
@@ -55,9 +52,6 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     //User input declaration
     public String userinput_distance;
     public String userinput_time;
-
-    //Receiver
-    public BroadcastReceiver broadcastReceiver;
 
 
     //Tool bar
@@ -84,14 +78,20 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     //Token
     Token_Container temporary_token_container;
     Token_Container current_token_container;
+
     //Gson
     Gson gson;
+
     //Spinner
     public boolean stop_moving;
+
+
     //My location
     String mylocation;
-    //Broad Cast Receiver
-    IntentFilter FCM_IntentFilter;
+
+
+    //Receiver
+    public BroadcastReceiver broadcastReceiver;
     BroadcastReceiver FCM_BroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -101,23 +101,36 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
         }
     };
+    //FCM Broad Cast Receiver
+    IntentFilter FCM_IntentFilter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //INITIALIZATION :
+
         //init the share preference
-        sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        sharedpreferences = getSharedPreferences(CONSTANT.MyPREFERENCES, Context.MODE_PRIVATE);
         editor = sharedpreferences.edit();
 
-        //token container
+        //init Token container
         temporary_token_container = new Token_Container();
         current_token_container = new Token_Container();
 
-        //toolbar init
+        //init toolbar init
         toolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
+
+        //init Gson
+        gson = new Gson();
+
+        //init FCM Broadcast receiver
+        FCM_IntentFilter = new IntentFilter(getPackageName() + ".CHAT_MESSAGE");
+
+        //init Firebase Cloud Messaging
+        firebase_intent = new Intent(this, FirebaseCloudMessaging.class);
 
 
         //Set button and click listener
@@ -127,14 +140,6 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
-        //Gson
-        gson = new Gson();
-
-        //FCM Broadcast receiver
-        FCM_IntentFilter = new IntentFilter(getPackageName() + ".CHAT_MESSAGE");
-        //Firebase Cloud Messaging
-
-        firebase_intent = new Intent(this, FirebaseCloudMessaging.class);
 
 
         FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
@@ -144,24 +149,15 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                 Log.d("FCM Id f/Activities", task.getResult().getId());
             }
         });
-
-        FirebaseMessaging.getInstance().subscribeToTopic("TRACKING")
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (!task.isSuccessful()) {
-                            Log.d("Subscribe ", "Fail");
-                        }
-                        Log.d("subscribe : ", "success");
-                    }
-                });
-
+        //Subscribe_Traking
+        Subscribe_Tracking();
 
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
         if (broadcastReceiver == null) {
             broadcastReceiver = new BroadcastReceiver() {
                 @Override
@@ -172,16 +168,22 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                     sedentary_end = (long) intent.getExtras().get(CONSTANT.SENDENTARY_END_KEY);
                     stop_moving = (boolean) intent.getExtras().get(CONSTANT.STOP_MOVING);
                     Log.d(CONSTANT.STOP_MOVING, stop_moving + "");
+
+                    //If stop moving -> send the a post request
                     if (stop_moving) {
                         send_post_request();
                     }
+
                 }
             };
         }
+
+        //register receiver
         registerReceiver(broadcastReceiver, new IntentFilter("location_update"));
         LocalBroadcastManager.getInstance(this).registerReceiver(FCM_BroadcastReceiver, FCM_IntentFilter);
     }
 
+    //Menu Fragment Passing
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.my_menu, menu);
@@ -197,6 +199,12 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(FCM_BroadcastReceiver);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         if (broadcastReceiver != null) {
@@ -204,7 +212,12 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         }
     }
 
-    //Call back of permission result;
+
+    /*
+    Callback for permission check
+    Call back of permission result;
+    Return true if pass checking false if not
+    */
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -217,15 +230,11 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         }
     }
 
-    //Return true if pass checking false if not
     public boolean permission_checking() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return false;
-        } else {
-            return true;
-        }
+        return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
+    //Get the data from the menu fragment
 
     @Override
     public void get_message(String distance, String time) {
@@ -233,16 +242,32 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         userinput_time = time;
     }
 
+    //Rebot the emulator retrive the list from the share preference
+
     public void list_retrieve() {
         String json = sharedpreferences.getString("tojson", null);
         current_token_container = gson.fromJson(json, Token_Container.class);
+
         try {
             current_token_container.expire_days_checker();
             System.out.println("list retrieve : " + current_token_container.print());
-
         } catch (Exception e) {
             System.out.println("it is empty");
         }
+
+    }
+
+    public void Subscribe_Tracking() {
+        FirebaseMessaging.getInstance().subscribeToTopic("TRACKING")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (!task.isSuccessful()) {
+                            Log.d("Subscribe Tracking", "Fail");
+                        }
+                        Log.d("Subscribe : Tracking", "Success");
+                    }
+                });
     }
 
     public void button_init() {
@@ -250,6 +275,9 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         stop_button = (Button) findViewById(R.id.stop_button);
         token_generator = (Button) findViewById(R.id.token_generator);
         clear_button = (Button) findViewById(R.id.clear);
+        Get_token = (Button) findViewById(R.id.get_tocken);
+
+
         clear_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -272,12 +300,10 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                 String json = gson.toJson(temporary_token_container);
                 editor.putString(CONSTANT.TO_JSON, json);
                 editor.commit();
-
-
             }
         });
 
-        Get_token = (Button) findViewById(R.id.get_tocken);
+
         Get_token.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -307,6 +333,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
 
     }
+    //Fragment connection
 
     public void setting_fragement_transaction() {
 
@@ -321,12 +348,6 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
     }
 
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(FCM_BroadcastReceiver);
-    }
 
     public void send_post_request() {
 
