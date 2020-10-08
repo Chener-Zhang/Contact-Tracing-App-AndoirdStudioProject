@@ -36,6 +36,8 @@ import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 
+import org.json.JSONArray;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -90,7 +92,9 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     //My location
     String mylocation;
 
-
+    //JsonArray UUIDS and long DATE
+    JSONArray jsonArray;
+    long date_long;
     //Receiver
     public BroadcastReceiver broadcastReceiver;
     BroadcastReceiver FCM_BroadcastReceiver = new BroadcastReceiver() {
@@ -172,11 +176,12 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                     sedentary_begin = (long) intent.getExtras().get(CONSTANT.SENDENTARY_BEGIN_KEY);
                     sedentary_end = (long) intent.getExtras().get(CONSTANT.SENDENTARY_END_KEY);
                     stop_moving = (boolean) intent.getExtras().get(CONSTANT.STOP_MOVING);
+
                     Log.d(CONSTANT.STOP_MOVING, stop_moving + "");
 
                     //If stop moving -> send the a post request
                     if (stop_moving) {
-                        send_post_request(tracking_url);
+                        send_tracking_post_request();
                     }
 
                 }
@@ -353,7 +358,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             @Override
             public void onClick(View view) {
                 Log.d("Sick Button", "Clicked");
-                send_post_request(tracing_url);
+                send_tracing_post_request();
             }
         });
 
@@ -375,11 +380,10 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     }
 
 
-    public void send_post_request(String url) {
-
+    public void send_tracking_post_request() {
         //POST REQUEST BEGIN
         RequestQueue postqueue = Volley.newRequestQueue(this);
-        StringRequest postquest = new StringRequest(Request.Method.POST, url,
+        StringRequest postquest = new StringRequest(Request.Method.POST, tracking_url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -400,12 +404,53 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                 params.put(CONSTANT.LONGTITUDE, String.valueOf(longtitude));
                 params.put(CONSTANT.SEDENTARY_BEGIN, String.valueOf(sedentary_begin));
                 params.put(CONSTANT.SEDENTARY_END, String.valueOf(sedentary_end));
+                Log.d("TRACKING MESSAGE", "SEND");
                 return params;
 
             }
         };
         postqueue.add(postquest);
         //POST REQUEST END
+    }
+
+    public void send_tracing_post_request() {
+        //POST REQUEST BEGIN
+        RequestQueue postqueue = Volley.newRequestQueue(this);
+        StringRequest postquest = new StringRequest(Request.Method.POST, tracing_url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        System.out.println("response from post request " + response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.out.println("get the VolleyError " + error.toString());
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+
+                Map<String, String> params = new HashMap<String, String>();
+
+                //Testing........
+                jsonArray = new JSONArray();
+                jsonArray.put("tuh12085");
+                date_long = 123456;
+                //Testing........
+
+
+                params.put(CONSTANT.UUIDS, jsonArray.toString());
+                params.put(CONSTANT.DATE, String.valueOf(date_long));
+
+                Log.d("TRACING MESSAGE", "SEND");
+                return params;
+
+            }
+        };
+        postqueue.add(postquest);
+        //POST REQUEST END
+
     }
 
 

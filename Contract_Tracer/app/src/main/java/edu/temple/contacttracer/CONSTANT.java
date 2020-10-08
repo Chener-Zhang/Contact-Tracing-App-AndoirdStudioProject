@@ -15,14 +15,16 @@ public class CONSTANT {
 
     //UUID IMFORMATIONS
     public static final String UUID = "uuid";
+    public static final String UUIDS = "uuids";
     public static final String MY_UUID = "tuh12085";
     public static final String LATITUDE = "latitude";
     public static final String LONGTITUDE = "longitude";
     public static final String SEDENTARY_BEGIN = "sedentary_begin";
     public static final String SEDENTARY_END = "sedentary_end";
+    public static final String DATE = "date";
 
 
     public static final String TO_JSON = "tojson";
     public static final String STOP_MOVING = "stop_moving";
-    
+
 }

@@ -30,6 +30,15 @@ public class FirebaseCloudMessaging extends FirebaseMessagingService {
             Log.d("Tracing ", "Data Received");
             String json = remoteMessage.getData().get("payload");
             Log.d("FCM Data From Tracing: ", json);
+            try {
+                JSONObject jsonObject = new JSONObject(json);
+                Log.d("FROM TRACING", jsonObject.toString());
+//                Log.d("DATE IN JSON_OBJECT", (String) jsonObject.get(CONSTANT.DATE));
+//                Log.d("UUID IN JSON_OBJECT", (String) jsonObject.get(CONSTANT.UUIDS));
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
 
         } else {
@@ -73,6 +82,7 @@ public class FirebaseCloudMessaging extends FirebaseMessagingService {
 
 
             Intent message_from_FCM = new Intent(getPackageName() + ".CHAT_MESSAGE");
+
 
             //PASS THE DATA TO INTENT
             message_from_FCM.putExtra(CONSTANT.JSON_FROM_BROADCAST, json);
