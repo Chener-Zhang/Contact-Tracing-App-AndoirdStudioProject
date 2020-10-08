@@ -36,9 +36,10 @@ import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 
+import org.json.JSONArray;
+
 import java.util.HashMap;
 import java.util.Map;
-
 
 
 public class MainActivity extends AppCompatActivity implements value_sender {
@@ -58,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     //Tool bar
     public Toolbar toolbar;
     public MenuItem menuItem;
+    public static String tracking_url = "https://kamorris.com/lab/ct_tracking.php";
 
 
     //Dynamic Variable;
@@ -67,8 +69,9 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     public long sedentary_end;
 
     //URL
-
-    public static String url = "https://kamorris.com/lab/ct_tracking.php";
+    public static String tracing_url = "https://kamorris.com/lab/ct_tracing.php";
+    public MenuItem date_picker;
+    public Button get_sick_button;
     //Firebase intent
     Intent firebase_intent;
     public Button Get_token;
@@ -90,7 +93,9 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     //My location
     String mylocation;
 
-
+    //JsonArray UUIDS and long DATE
+    JSONArray jsonArray;
+    long date_long;
     //Receiver
     public BroadcastReceiver broadcastReceiver;
     BroadcastReceiver FCM_BroadcastReceiver = new BroadcastReceiver() {
@@ -151,7 +156,11 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             }
         });
         //Subscribe_Traking
-        Subscribe_Tracking();
+        subscribe_Tracking();
+
+        //Subscribe_Tracing
+        subscribe_Tracing();
+
 
     }
 
@@ -168,11 +177,12 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                     sedentary_begin = (long) intent.getExtras().get(CONSTANT.SENDENTARY_BEGIN_KEY);
                     sedentary_end = (long) intent.getExtras().get(CONSTANT.SENDENTARY_END_KEY);
                     stop_moving = (boolean) intent.getExtras().get(CONSTANT.STOP_MOVING);
+
                     Log.d(CONSTANT.STOP_MOVING, stop_moving + "");
 
                     //If stop moving -> send the a post request
                     if (stop_moving) {
-                        send_post_request();
+                        send_tracking_post_request();
                     }
 
                 }
@@ -188,11 +198,25 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.my_menu, menu);
+
+        //init the button0
         menuItem = menu.findItem(R.id.setting_menu);
+        date_picker = menu.findItem(R.id.date_picker);
+
+
         menuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 setting_fragement_transaction();
+                return true;
+            }
+        });
+
+        date_picker.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                Log.d("Date Picker Button", "Clicked");
+                setDate_picker_fragment_transaction();
                 return true;
             }
         });
@@ -258,7 +282,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
     }
 
-    public void Subscribe_Tracking() {
+    public void subscribe_Tracking() {
         FirebaseMessaging.getInstance().subscribeToTopic("TRACKING")
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -271,13 +295,26 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                 });
     }
 
-    public void button_init() {
-        start_button = (Button) findViewById(R.id.start_button);
-        stop_button = (Button) findViewById(R.id.stop_button);
-        token_generator = (Button) findViewById(R.id.token_generator);
-        clear_button = (Button) findViewById(R.id.clear);
-        Get_token = (Button) findViewById(R.id.get_tocken);
+    public void subscribe_Tracing() {
+        FirebaseMessaging.getInstance().subscribeToTopic("/topics/TRACING")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (!task.isSuccessful()) {
+                            Log.d("Subscribe Tracing", "Fail");
+                        }
+                        Log.d("Subscribe : Tracing", "Success");
+                    }
+                });
+    }
 
+    public void button_init() {
+        start_button = findViewById(R.id.start_button);
+        stop_button = findViewById(R.id.stop_button);
+        token_generator = findViewById(R.id.token_generator);
+        clear_button = findViewById(R.id.clear);
+        Get_token = findViewById(R.id.get_tocken);
+        get_sick_button = findViewById(R.id.send_report);
 
         clear_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -332,6 +369,14 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             }
         });
 
+        get_sick_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("Sick Button", "Clicked");
+                send_tracing_post_request();
+            }
+        });
+
 
     }
     //Fragment connection
@@ -349,12 +394,21 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
     }
 
+    public void setDate_picker_fragment_transaction() {
+        //Basic Fragment Manager setup
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-    public void send_post_request() {
+        //create a new Date time picker fragment
+        Date_time_Picker_VIEW date_time_picker_view = Date_time_Picker_VIEW.newInstance(null, null);
+        fragmentTransaction.replace(R.id.fragment_container, date_time_picker_view).addToBackStack(null);
+        fragmentTransaction.commit();
+    }
 
+    public void send_tracking_post_request() {
         //POST REQUEST BEGIN
         RequestQueue postqueue = Volley.newRequestQueue(this);
-        StringRequest postquest = new StringRequest(Request.Method.POST, url,
+        StringRequest postquest = new StringRequest(Request.Method.POST, tracking_url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -375,12 +429,53 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                 params.put(CONSTANT.LONGTITUDE, String.valueOf(longtitude));
                 params.put(CONSTANT.SEDENTARY_BEGIN, String.valueOf(sedentary_begin));
                 params.put(CONSTANT.SEDENTARY_END, String.valueOf(sedentary_end));
+                Log.d("TRACKING MESSAGE", "SEND");
                 return params;
 
             }
         };
         postqueue.add(postquest);
         //POST REQUEST END
+    }
+
+    public void send_tracing_post_request() {
+        //POST REQUEST BEGIN
+        RequestQueue postqueue = Volley.newRequestQueue(this);
+        StringRequest postquest = new StringRequest(Request.Method.POST, tracing_url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        System.out.println("response from post request " + response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.out.println("get the VolleyError " + error.toString());
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+
+                Map<String, String> params = new HashMap<String, String>();
+
+                //Testing........
+                jsonArray = new JSONArray();
+                jsonArray.put("tuh12085");
+                date_long = 123456;
+                //Testing........
+
+
+                params.put(CONSTANT.UUIDS, jsonArray.toString());
+                params.put(CONSTANT.DATE, String.valueOf(date_long));
+
+                Log.d("TRACING MESSAGE", "SEND");
+                return params;
+
+            }
+        };
+        postqueue.add(postquest);
+        //POST REQUEST END
+
     }
 
 

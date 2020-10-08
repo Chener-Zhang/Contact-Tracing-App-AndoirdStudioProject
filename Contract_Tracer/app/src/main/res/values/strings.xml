@@ -27,4 +27,6 @@
     <string name="generate_token">Generate Token</string>
 
     <string name="mytitle">mytitle</string>
+    <string name="date_picker">DATE PICKER</string>
+
 </resources>
