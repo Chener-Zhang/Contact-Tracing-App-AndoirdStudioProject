@@ -37,6 +37,8 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,16 +61,15 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     //Tool bar
     public Toolbar toolbar;
     public MenuItem menuItem;
+
+
+    //URL
     public static String tracking_url = "https://kamorris.com/lab/ct_tracking.php";
-
-
     //Dynamic Variable;
     public double longtitude;
     public double latitude;
     public long sedentary_begin;
     public long sedentary_end;
-
-    //URL
     public static String tracing_url = "https://kamorris.com/lab/ct_tracing.php";
     public MenuItem date_picker;
     public Button get_sick_button;
@@ -103,6 +104,31 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         public void onReceive(Context context, Intent intent) {
             String json = intent.getStringExtra("json_file");
             mylocation = intent.getStringExtra(CONSTANT.MYLOCATION);
+            try {
+
+
+                JSONObject jsonObject = new JSONObject(json);
+                System.out.println("\n\n-----TEST--------->");
+                double latitude = jsonObject.getDouble(CONSTANT.LATITUDE);
+                double longtitude = jsonObject.getDouble(CONSTANT.LONGTITUDE);
+                long sedentary_begin = jsonObject.getLong(CONSTANT.SEDENTARY_BEGIN);
+                long sedentary_end = jsonObject.getLong(CONSTANT.SEDENTARY_END);
+
+                //Token(double latitude, double longtitude, long sedentary_begin, long sedentary_end, LocalDate date)
+                Token other_tocken = new Token(latitude, longtitude, sedentary_begin, sedentary_end);
+                temporary_token_container.add(other_tocken);
+
+                String other_json = gson.toJson(temporary_token_container);
+                editor.putString(CONSTANT.TO_JSON, other_json);
+                editor.commit();
+
+                System.out.println("-----TEST--------->\n\n");
+
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
             Log.d("Main Activity json receive", json);
 
         }
@@ -178,10 +204,18 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                     sedentary_end = (long) intent.getExtras().get(CONSTANT.SENDENTARY_END_KEY);
                     stop_moving = (boolean) intent.getExtras().get(CONSTANT.STOP_MOVING);
 
+
                     Log.d(CONSTANT.STOP_MOVING, stop_moving + "");
 
                     //If stop moving -> send the a post request
                     if (stop_moving) {
+                        Token token = new Token(latitude, longtitude, sedentary_begin, sedentary_end);
+                        temporary_token_container.add(token);
+
+                        String json = gson.toJson(temporary_token_container);
+                        editor.putString(CONSTANT.TO_JSON, json);
+                        editor.commit();
+
                         send_tracking_post_request();
                     }
 
@@ -325,22 +359,6 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                 System.out.println("Tokens have been all clear");
             }
         });
-        token_generator.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.d("button", "trigger");
-                Log.d("Long", String.valueOf(longtitude));
-                Log.d("La", String.valueOf(longtitude));
-
-                Token token = new Token(latitude, longtitude, sedentary_begin, sedentary_end);
-                temporary_token_container.add(token);
-
-                String json = gson.toJson(temporary_token_container);
-                editor.putString(CONSTANT.TO_JSON, json);
-                editor.commit();
-            }
-        });
-
 
         Get_token.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -377,6 +395,17 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             }
         });
 
+        token_generator.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Token token = new Token(latitude, longtitude, sedentary_begin, sedentary_end);
+                temporary_token_container.add(token);
+
+                String json = gson.toJson(temporary_token_container);
+                editor.putString(CONSTANT.TO_JSON, json);
+                editor.commit();
+            }
+        });
 
     }
     //Fragment connection
@@ -429,6 +458,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                 params.put(CONSTANT.LONGTITUDE, String.valueOf(longtitude));
                 params.put(CONSTANT.SEDENTARY_BEGIN, String.valueOf(sedentary_begin));
                 params.put(CONSTANT.SEDENTARY_END, String.valueOf(sedentary_end));
+
+
                 Log.d("TRACKING MESSAGE", "SEND");
                 return params;
 

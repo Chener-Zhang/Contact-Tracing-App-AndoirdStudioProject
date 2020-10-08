@@ -16,11 +16,12 @@ public class Token {
 
     public Token(double latitude, double longtitude, long sedentary_begin, long sedentary_end) {
         this.UUID = Token_generator();
-        this.date = getDate();
         this.latitude = latitude;
         this.longtitude = longtitude;
         this.sedentary_begin = sedentary_begin;
         this.sedentary_end = sedentary_end;
+        this.date = getDate();
+
     }
 
     public String Token_generator() {

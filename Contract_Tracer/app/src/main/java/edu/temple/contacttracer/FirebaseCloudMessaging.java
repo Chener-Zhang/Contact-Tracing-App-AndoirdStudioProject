@@ -59,11 +59,6 @@ public class FirebaseCloudMessaging extends FirebaseMessagingService {
 
                     try {
                         String other_uuid = jsonObject.getString(CONSTANT.UUID);
-                        double other_latitude = Double.parseDouble(jsonObject.getString(CONSTANT.LATITUDE));
-                        double other_longtitude = Double.parseDouble(jsonObject.getString(CONSTANT.LONGTITUDE));
-                        long other_sedentary_begin = Long.parseLong(jsonObject.getString(CONSTANT.SEDENTARY_BEGIN));
-                        long other_sedentary_end = Long.parseLong(jsonObject.getString(CONSTANT.SEDENTARY_END));
-
                         //Check with if uuid is my from the server
                         if (other_uuid == CONSTANT.MY_UUID) {
                             mylocation = json;
