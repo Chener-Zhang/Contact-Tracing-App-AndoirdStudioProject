@@ -79,6 +79,7 @@
                 android:text="GET TOCKENS"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
+
             <Button
                 android:id="@+id/clear"
                 android:layout_width="match_parent"
@@ -86,6 +87,15 @@
                 android:text="CLEAR TOKEN STORAGE"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
+
+            <Button
+                android:id="@+id/get_sicks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="GET SICK"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
 
         </LinearLayout>
     </FrameLayout>

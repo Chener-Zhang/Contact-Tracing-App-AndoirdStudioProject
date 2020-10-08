@@ -40,7 +40,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-
 public class MainActivity extends AppCompatActivity implements value_sender {
 
     //Button
@@ -48,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     public Button stop_button;
     public Button token_generator;
     public Button clear_button;
+    public static String tracking_url = "https://kamorris.com/lab/ct_tracking.php";
 
 
     //User input declaration
@@ -67,8 +67,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     public long sedentary_end;
 
     //URL
-
-    public static String url = "https://kamorris.com/lab/ct_tracking.php";
+    public static String tracing_url = "https://kamorris.com/lab/ct_tracing.php";
+    public Button get_sick_button;
     //Firebase intent
     Intent firebase_intent;
     public Button Get_token;
@@ -151,7 +151,11 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             }
         });
         //Subscribe_Traking
-        Subscribe_Tracking();
+        subscribe_Tracking();
+
+        //Subscribe_Tracing
+        subscribe_Tracing();
+
 
     }
 
@@ -258,7 +262,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
     }
 
-    public void Subscribe_Tracking() {
+    public void subscribe_Tracking() {
         FirebaseMessaging.getInstance().subscribeToTopic("TRACKING")
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -271,13 +275,26 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                 });
     }
 
+    public void subscribe_Tracing() {
+        FirebaseMessaging.getInstance().subscribeToTopic("/topics/TRACING")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (!task.isSuccessful()) {
+                            Log.d("Subscribe Tracing", "Fail");
+                        }
+                        Log.d("Subscribe : Tracing", "Success");
+                    }
+                });
+    }
+
     public void button_init() {
         start_button = (Button) findViewById(R.id.start_button);
         stop_button = (Button) findViewById(R.id.stop_button);
         token_generator = (Button) findViewById(R.id.token_generator);
         clear_button = (Button) findViewById(R.id.clear);
         Get_token = (Button) findViewById(R.id.get_tocken);
-
+        get_sick_button = (Button) findViewById(R.id.get_sicks);
 
         clear_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -332,6 +349,13 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             }
         });
 
+        get_sick_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("Sick Button", "Clicked");
+            }
+        });
+
 
     }
     //Fragment connection
@@ -354,7 +378,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
         //POST REQUEST BEGIN
         RequestQueue postqueue = Volley.newRequestQueue(this);
-        StringRequest postquest = new StringRequest(Request.Method.POST, url,
+        StringRequest postquest = new StringRequest(Request.Method.POST, tracking_url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
