@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
@@ -14,10 +15,10 @@ public class Token_Container {
         tokenArrayList = new ArrayList<Token>();
     }
 
-    public Token get_token(String uuid) {
+    public Token get_token(UUID my_uuid) {
         Token return_value = null;
         for (Token token : tokenArrayList) {
-            if (token.UUID == uuid) {
+            if (token.uuid == my_uuid) {
                 return_value = token;
             } else {
                 return_value = null;

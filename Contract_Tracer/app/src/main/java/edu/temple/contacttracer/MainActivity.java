@@ -42,6 +42,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 
 public class MainActivity extends AppCompatActivity implements value_sender {
@@ -66,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     //URL
     public static String tracking_url = "https://kamorris.com/lab/ct_tracking.php";
     //Dynamic Variable;
+    public UUID uuid;
     public double longtitude;
     public double latitude;
     public long sedentary_begin;
@@ -73,6 +75,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     public static String tracing_url = "https://kamorris.com/lab/ct_tracing.php";
     public MenuItem date_picker;
     public Button get_sick_button;
+
+
     //Firebase intent
     Intent firebase_intent;
     public Button Get_token;
@@ -109,13 +113,19 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
                 JSONObject jsonObject = new JSONObject(json);
                 System.out.println("\n\n-----TEST--------->");
+
+                String uuid_in_string = (String) jsonObject.get(CONSTANT.UUID);
                 double latitude = jsonObject.getDouble(CONSTANT.LATITUDE);
                 double longtitude = jsonObject.getDouble(CONSTANT.LONGTITUDE);
                 long sedentary_begin = jsonObject.getLong(CONSTANT.SEDENTARY_BEGIN);
                 long sedentary_end = jsonObject.getLong(CONSTANT.SEDENTARY_END);
 
+
+                Log.d("UUID : ", uuid_in_string);
+                UUID uuid = UUID.fromString(uuid_in_string);
+
                 //Token(double latitude, double longtitude, long sedentary_begin, long sedentary_end, LocalDate date)
-                Token other_tocken = new Token(latitude, longtitude, sedentary_begin, sedentary_end);
+                Token other_tocken = new Token(uuid, latitude, longtitude, sedentary_begin, sedentary_end);
                 temporary_token_container.add(other_tocken);
 
                 String other_json = gson.toJson(temporary_token_container);
@@ -198,6 +208,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             broadcastReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
+                    uuid = (UUID) intent.getExtras().get(CONSTANT.UUID);
                     longtitude = (double) intent.getExtras().get(CONSTANT.LONGTITUDE_KEY);
                     latitude = (double) intent.getExtras().get(CONSTANT.LATITUDE_KEY);
                     sedentary_begin = (long) intent.getExtras().get(CONSTANT.SENDENTARY_BEGIN_KEY);
@@ -209,9 +220,9 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
                     //If stop moving -> send the a post request
                     if (stop_moving) {
-                        Token token = new Token(latitude, longtitude, sedentary_begin, sedentary_end);
+                        Token token = new Token(null, latitude, longtitude, sedentary_begin, sedentary_end);
                         temporary_token_container.add(token);
-
+                        uuid = token.uuid;
                         String json = gson.toJson(temporary_token_container);
                         editor.putString(CONSTANT.TO_JSON, json);
                         editor.commit();
@@ -398,7 +409,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         token_generator.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Token token = new Token(latitude, longtitude, sedentary_begin, sedentary_end);
+                Token token = new Token(null, latitude, longtitude, sedentary_begin, sedentary_end);
                 temporary_token_container.add(token);
 
                 String json = gson.toJson(temporary_token_container);
@@ -453,7 +464,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             protected Map<String, String> getParams() throws AuthFailureError {
 
                 Map<String, String> params = new HashMap<String, String>();
-                params.put(CONSTANT.UUID, "tuh12085");
+
+                params.put(CONSTANT.UUID, String.valueOf(uuid));
                 params.put(CONSTANT.LATITUDE, String.valueOf(latitude));
                 params.put(CONSTANT.LONGTITUDE, String.valueOf(longtitude));
                 params.put(CONSTANT.SEDENTARY_BEGIN, String.valueOf(sedentary_begin));
