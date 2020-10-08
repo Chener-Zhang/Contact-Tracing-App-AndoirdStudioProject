@@ -216,6 +216,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 Log.d("Date Picker Button", "Clicked");
+                setDate_picker_fragment_transaction();
                 return true;
             }
         });
@@ -393,6 +394,16 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
     }
 
+    public void setDate_picker_fragment_transaction() {
+        //Basic Fragment Manager setup
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        //create a new Date time picker fragment
+        Date_time_Picker_VIEW date_time_picker_view = Date_time_Picker_VIEW.newInstance(null, null);
+        fragmentTransaction.replace(R.id.fragment_container, date_time_picker_view).addToBackStack(null);
+        fragmentTransaction.commit();
+    }
 
     public void send_tracking_post_request() {
         //POST REQUEST BEGIN
