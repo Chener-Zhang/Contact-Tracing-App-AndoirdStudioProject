@@ -86,8 +86,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
 
     //Token
-    Token_Container temporary_token_container;
-    Token_Container current_token_container;
+    Token_Container ALL_token_container;
+    Token_Container list_retrieve_token_container;
 
     //Gson
     Gson gson;
@@ -127,9 +127,10 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
                 //Token(double latitude, double longtitude, long sedentary_begin, long sedentary_end, LocalDate date)
                 Token other_tocken = new Token(uuid, latitude, longtitude, sedentary_begin, sedentary_end);
-                temporary_token_container.add(other_tocken);
+                ALL_token_container.others_add(other_tocken);
+                ALL_token_container.discard_repeate();
 
-                String other_json = gson.toJson(temporary_token_container);
+                String other_json = gson.toJson(ALL_token_container);
                 editor.putString(CONSTANT.TO_JSON, other_json);
                 editor.commit();
 
@@ -159,8 +160,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         editor = sharedpreferences.edit();
 
         //init Token container
-        temporary_token_container = new Token_Container();
-        current_token_container = new Token_Container();
+        ALL_token_container = new Token_Container();
+        list_retrieve_token_container = new Token_Container();
 
         //init toolbar init
         toolbar = findViewById(R.id.my_toolbar);
@@ -222,9 +223,9 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                     //If stop moving -> send the a post request
                     if (stop_moving) {
                         Token token = new Token(null, latitude, longtitude, sedentary_begin, sedentary_end);
-                        temporary_token_container.add(token);
+                        ALL_token_container.mine_add(token);
                         uuid = token.uuid;
-                        String json = gson.toJson(temporary_token_container);
+                        String json = gson.toJson(ALL_token_container);
                         editor.putString(CONSTANT.TO_JSON, json);
                         editor.commit();
 
@@ -317,14 +318,17 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
     public void list_retrieve() {
         String json = sharedpreferences.getString(CONSTANT.TO_JSON, null);
-        current_token_container = gson.fromJson(json, Token_Container.class);
+        list_retrieve_token_container = gson.fromJson(json, Token_Container.class);
 
         try {
-            current_token_container.expire_days_checker();
-            System.out.println("list retrieve : " + current_token_container.print());
+            list_retrieve_token_container.expire_days_checker();
+            System.out.println("list retrieve Mine: \n" + list_retrieve_token_container.print_mine_tokens());
+            System.out.println("list retrieve Others: \n" + list_retrieve_token_container.print_others_tokens());
+
         } catch (Exception e) {
             System.out.println("it is empty");
         }
+
 
     }
 
@@ -367,7 +371,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             public void onClick(View view) {
                 editor.clear();
                 editor.commit();
-                temporary_token_container.clear();
+                ALL_token_container.clear_mine();
+                ALL_token_container.clear_others();
                 System.out.println("Tokens have been all clear");
             }
         });
@@ -411,9 +416,9 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             @Override
             public void onClick(View view) {
                 Token token = new Token(null, latitude, longtitude, sedentary_begin, sedentary_end);
-                temporary_token_container.add(token);
+                ALL_token_container.mine_add(token);
 
-                String json = gson.toJson(temporary_token_container);
+                String json = gson.toJson(ALL_token_container);
                 editor.putString(CONSTANT.TO_JSON, json);
                 editor.commit();
             }
