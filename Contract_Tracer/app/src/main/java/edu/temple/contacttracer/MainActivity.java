@@ -270,7 +270,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     //Rebot the emulator retrive the list from the share preference
 
     public void list_retrieve() {
-        String json = sharedpreferences.getString("tojson", null);
+        String json = sharedpreferences.getString(CONSTANT.TO_JSON, null);
         current_token_container = gson.fromJson(json, Token_Container.class);
 
         try {
