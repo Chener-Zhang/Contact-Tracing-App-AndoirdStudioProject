@@ -89,10 +89,10 @@
                 app:layout_constraintStart_toStartOf="parent" />
 
             <Button
-                android:id="@+id/get_sicks"
+                android:id="@+id/send_report"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="GET SICK"
+                android:text="REPORT"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 

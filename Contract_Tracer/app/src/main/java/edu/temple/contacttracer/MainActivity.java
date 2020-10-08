@@ -49,7 +49,6 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     public Button stop_button;
     public Button token_generator;
     public Button clear_button;
-    public static String tracking_url = "https://kamorris.com/lab/ct_tracking.php";
 
 
     //User input declaration
@@ -60,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     //Tool bar
     public Toolbar toolbar;
     public MenuItem menuItem;
+    public static String tracking_url = "https://kamorris.com/lab/ct_tracking.php";
 
 
     //Dynamic Variable;
@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
     //URL
     public static String tracing_url = "https://kamorris.com/lab/ct_tracing.php";
+    public MenuItem date_picker;
     public Button get_sick_button;
     //Firebase intent
     Intent firebase_intent;
@@ -197,11 +198,24 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.my_menu, menu);
+
+        //init the button0
         menuItem = menu.findItem(R.id.setting_menu);
+        date_picker = menu.findItem(R.id.date_picker);
+
+
         menuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 setting_fragement_transaction();
+                return true;
+            }
+        });
+
+        date_picker.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                Log.d("Date Picker Button", "Clicked");
                 return true;
             }
         });
@@ -294,12 +308,12 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     }
 
     public void button_init() {
-        start_button = (Button) findViewById(R.id.start_button);
-        stop_button = (Button) findViewById(R.id.stop_button);
-        token_generator = (Button) findViewById(R.id.token_generator);
-        clear_button = (Button) findViewById(R.id.clear);
-        Get_token = (Button) findViewById(R.id.get_tocken);
-        get_sick_button = (Button) findViewById(R.id.get_sicks);
+        start_button = findViewById(R.id.start_button);
+        stop_button = findViewById(R.id.stop_button);
+        token_generator = findViewById(R.id.token_generator);
+        clear_button = findViewById(R.id.clear);
+        Get_token = findViewById(R.id.get_tocken);
+        get_sick_button = findViewById(R.id.send_report);
 
         clear_button.setOnClickListener(new View.OnClickListener() {
             @Override

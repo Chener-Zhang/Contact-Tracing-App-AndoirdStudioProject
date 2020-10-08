@@ -14,6 +14,18 @@ public class Token_Container {
         tokenArrayList = new ArrayList<Token>();
     }
 
+    public Token get_token(String uuid) {
+        Token return_value = null;
+        for (Token token : tokenArrayList) {
+            if (token.UUID == uuid) {
+                return_value = token;
+            } else {
+                return_value = null;
+            }
+        }
+        return return_value;
+    }
+
     public void add(Token token) {
         tokenArrayList.add(token);
     }

@@ -32,9 +32,13 @@ public class FirebaseCloudMessaging extends FirebaseMessagingService {
             Log.d("FCM Data From Tracing: ", json);
             try {
                 JSONObject jsonObject = new JSONObject(json);
+
+
+                System.out.println("code line 37; receive ");
                 Log.d("FROM TRACING", jsonObject.toString());
-//                Log.d("DATE IN JSON_OBJECT", (String) jsonObject.get(CONSTANT.DATE));
-//                Log.d("UUID IN JSON_OBJECT", (String) jsonObject.get(CONSTANT.UUIDS));
+
+                Log.d("GET THE UUIDS:", jsonObject.getJSONArray("uuids").toString());
+
 
             } catch (JSONException e) {
                 e.printStackTrace();
