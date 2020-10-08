@@ -6,21 +6,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
+
 
 public class Date_time_Picker_VIEW extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
 
-    //init the fragment transaction
-    FragmentManager fragmentManager;
-    FragmentTransaction fragmentTransaction;
-
-    //Get other 2 fragemnt
-    TimePickerDialog timePickerDialog_fragment;
-    MapFragment mapFragment;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -56,17 +48,9 @@ public class Date_time_Picker_VIEW extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View this_view = inflater.inflate(R.layout.date_picker_fragment_cotainer, container, false);
+        View this_view = inflater.inflate(R.layout.fragment_time_picker_dialog, container, false);
 
-        fragmentManager = getChildFragmentManager();
-        fragmentTransaction = fragmentManager.beginTransaction();
 
-        timePickerDialog_fragment = TimePickerDialog.newInstance(null, null);
-        mapFragment = MapFragment.newInstance(null, null);
-
-        fragmentTransaction.replace(R.id.date_picker_fragemnt_container, timePickerDialog_fragment);
-        fragmentTransaction.replace(R.id.map_fragemnt_container, mapFragment);
-        fragmentTransaction.commit();
 
         return this_view;
     }
