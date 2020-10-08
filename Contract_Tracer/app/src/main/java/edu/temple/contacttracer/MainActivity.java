@@ -40,6 +40,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -503,8 +504,12 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
                 //Testing........
                 jsonArray = new JSONArray();
-                jsonArray.put("tuh12085");
-                date_long = 123456;
+                if (uuid == null) {
+                    uuid = UUID.randomUUID();
+                }
+                jsonArray.put(uuid);
+
+                date_long = LocalDate.now().toEpochDay();
                 //Testing........
 
 
