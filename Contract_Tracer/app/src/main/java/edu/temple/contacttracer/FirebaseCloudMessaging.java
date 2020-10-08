@@ -27,6 +27,12 @@ public class FirebaseCloudMessaging extends FirebaseMessagingService {
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
         if (remoteMessage.getFrom().equals("/topics/TRACING")) {
+            Log.d("Tracing ", "Data Received");
+            String json = remoteMessage.getData().get("payload");
+            Log.d("FCM Data From Tracing: ", json);
+
+
+        } else {
             //Get datas
             String json = remoteMessage.getData().get("payload");
 
@@ -74,10 +80,6 @@ public class FirebaseCloudMessaging extends FirebaseMessagingService {
 
             //SEND THE BROAD CASE
             LocalBroadcastManager.getInstance(this).sendBroadcast(message_from_FCM);
-        } else {
-            Log.d("Tracking ", "Data Received");
-            String json = remoteMessage.getData().get("payload");
-            Log.d("FCM Data From Tracking: ", json);
         }
 
 

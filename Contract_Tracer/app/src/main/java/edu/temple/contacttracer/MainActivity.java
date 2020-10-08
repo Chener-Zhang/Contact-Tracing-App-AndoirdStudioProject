@@ -176,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
                     //If stop moving -> send the a post request
                     if (stop_moving) {
-                        send_post_request();
+                        send_post_request(tracking_url);
                     }
 
                 }
@@ -353,6 +353,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             @Override
             public void onClick(View view) {
                 Log.d("Sick Button", "Clicked");
+                send_post_request(tracing_url);
             }
         });
 
@@ -374,11 +375,11 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     }
 
 
-    public void send_post_request() {
+    public void send_post_request(String url) {
 
         //POST REQUEST BEGIN
         RequestQueue postqueue = Volley.newRequestQueue(this);
-        StringRequest postquest = new StringRequest(Request.Method.POST, tracking_url,
+        StringRequest postquest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
