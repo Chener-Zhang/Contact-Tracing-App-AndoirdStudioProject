@@ -8,7 +8,8 @@ public class CONSTANT {
     public static final String LATITUDE_KEY = "lat_key";
     public static final String SENDENTARY_BEGIN_KEY = "sendentary_begin_key";
     public static final String SENDENTARY_END_KEY = "sendentary_end_key";
-    public static final String JSON_FROM_BROADCAST = "json_file";
+    public static final String JSON_FROM_BROADCAST_TRACKING = "tracking_json_file";
+    public static final String JSON_FROM_BROADCAST_TRACING = "tracing_json_file";
     public static final String MYLOCATION = "mylocation";
     public static final String MyPREFERENCES = "MyPrefs";
 

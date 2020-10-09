@@ -37,9 +37,15 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 
 public class MainActivity extends AppCompatActivity implements value_sender {
@@ -59,19 +65,22 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     //Tool bar
     public Toolbar toolbar;
     public MenuItem menuItem;
-    public static String tracking_url = "https://kamorris.com/lab/ct_tracking.php";
 
+
+    //URL
+    public static String tracking_url = "https://kamorris.com/lab/ct_tracking.php";
+    public static String tracing_url = "https://kamorris.com/lab/ct_tracing.php";
 
     //Dynamic Variable;
+    public UUID uuid;
     public double longtitude;
     public double latitude;
     public long sedentary_begin;
     public long sedentary_end;
-
-    //URL
-    public static String tracing_url = "https://kamorris.com/lab/ct_tracing.php";
     public MenuItem date_picker;
     public Button get_sick_button;
+
+
     //Firebase intent
     Intent firebase_intent;
     public Button Get_token;
@@ -81,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
     //Token
     Token_Container temporary_token_container;
-    Token_Container current_token_container;
+    Token_Container list_retrieve_token_container;
 
     //Gson
     Gson gson;
@@ -94,21 +103,110 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     String mylocation;
 
     //JsonArray UUIDS and long DATE
-    JSONArray jsonArray;
+    JSONArray others_tracing_uuids_jsonArray;
+    JSONArray my_uuids_jsonArray;
     long date_long;
+
+
     //Receiver
     public BroadcastReceiver broadcastReceiver;
-    BroadcastReceiver FCM_BroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String json = intent.getStringExtra("json_file");
-            mylocation = intent.getStringExtra(CONSTANT.MYLOCATION);
-            Log.d("Main Activity json receive", json);
 
-        }
-    };
     //FCM Broad Cast Receiver
     IntentFilter FCM_IntentFilter;
+
+
+    //Date for positive report
+    List<Long> positive_report_date;
+
+
+    //Receive the message from the FCM class . Include Tracking and Tracing message
+    final BroadcastReceiver FCM_BroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String tracking_json = intent.getStringExtra(CONSTANT.JSON_FROM_BROADCAST_TRACKING);
+            String tracing_json = intent.getStringExtra(CONSTANT.JSON_FROM_BROADCAST_TRACING);
+
+            mylocation = intent.getStringExtra(CONSTANT.MYLOCATION);
+
+            //Retrieve tracking FCM message;
+            try {
+                if (tracking_json != null) {
+                    JSONObject jsonObject = new JSONObject(tracking_json);
+
+                    String uuid_in_string = (String) jsonObject.get(CONSTANT.UUID);
+                    double latitude = jsonObject.getDouble(CONSTANT.LATITUDE);
+                    double longtitude = jsonObject.getDouble(CONSTANT.LONGTITUDE);
+                    long sedentary_begin = jsonObject.getLong(CONSTANT.SEDENTARY_BEGIN);
+                    long sedentary_end = jsonObject.getLong(CONSTANT.SEDENTARY_END);
+
+                    UUID uuid = UUID.fromString(uuid_in_string);
+
+                    //Token(double latitude, double longtitude, long sedentary_begin, long sedentary_end, LocalDate date)
+                    Token other_tocken = new Token(uuid, latitude, longtitude, sedentary_begin, sedentary_end);
+                    temporary_token_container.others_add(other_tocken);
+                    temporary_token_container.discard_repeate();
+
+                    String other_json = gson.toJson(temporary_token_container);
+                    editor.putString(CONSTANT.TO_JSON, other_json);
+                    editor.commit();
+
+                }
+
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            //Retrieve tracing FCM message
+            try {
+                if (tracing_json != null) {
+                    Log.d("BRAOD CAST FROM TRACING TO MAIN ACTIVITIES", "RECEIVED");
+
+                    list_retrieve();
+
+                    JSONObject object = new JSONObject(tracing_json);
+                    JSONArray all_uuids_jsonAray = object.getJSONArray(CONSTANT.UUIDS);
+
+                    others_tracing_uuids_jsonArray = filter_uuids_return_other(my_uuids_jsonArray, all_uuids_jsonAray);
+
+                    //add the positive date to the calendar fragment
+                    positive_report_date.add((Long) object.get(CONSTANT.DATE));
+
+                    Log.d("POSITIVE_REPORT_DATE", positive_report_date.toString());
+
+                }
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        }
+    };
+
+    public JSONArray filter_uuids_return_other(JSONArray mine_uuids, JSONArray others_uuids) throws JSONException {
+        JSONArray return_values = new JSONArray();
+
+
+        ArrayList<String> mine_list = new ArrayList<String>();
+        ArrayList<String> other_list = new ArrayList<String>();
+
+        for (int i = 0; i < mine_uuids.length(); i++) {
+            mine_list.add(mine_uuids.get(i).toString());
+        }
+        for (int i = 0; i < others_uuids.length(); i++) {
+            other_list.add(others_uuids.get(i).toString());
+        }
+        System.out.println("\n\n------------------------------------------------\n\n");
+        Log.d("ALL UUIDS", other_list.toString());
+        Log.d("Mine UUIDS", mine_list.toString());
+        System.out.println("\n\n------------------------------------------------\n\n");
+        //remove repetition
+        other_list.removeAll(mine_list);
+
+        //maybe require convert string to uuid
+        for (String s : other_list) {
+            return_values.put(UUID.fromString(s));
+        }
+        Log.d("RETURN VALUE AFTER FILTER", return_values.toString());
+        return return_values;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,7 +221,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
         //init Token container
         temporary_token_container = new Token_Container();
-        current_token_container = new Token_Container();
+        list_retrieve_token_container = new Token_Container();
 
         //init toolbar init
         toolbar = findViewById(R.id.my_toolbar);
@@ -138,6 +236,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         //init Firebase Cloud Messaging
         firebase_intent = new Intent(this, FirebaseCloudMessaging.class);
 
+        //init others dates
+        positive_report_date = new ArrayList<Long>();
 
         //Set button and click listener
         button_init();
@@ -172,16 +272,25 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             broadcastReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
+                    uuid = (UUID) intent.getExtras().get(CONSTANT.UUID);
                     longtitude = (double) intent.getExtras().get(CONSTANT.LONGTITUDE_KEY);
                     latitude = (double) intent.getExtras().get(CONSTANT.LATITUDE_KEY);
                     sedentary_begin = (long) intent.getExtras().get(CONSTANT.SENDENTARY_BEGIN_KEY);
                     sedentary_end = (long) intent.getExtras().get(CONSTANT.SENDENTARY_END_KEY);
                     stop_moving = (boolean) intent.getExtras().get(CONSTANT.STOP_MOVING);
 
+
                     Log.d(CONSTANT.STOP_MOVING, stop_moving + "");
 
                     //If stop moving -> send the a post request
                     if (stop_moving) {
+                        Token token = new Token(null, latitude, longtitude, sedentary_begin, sedentary_end);
+                        temporary_token_container.mine_add(token);
+                        uuid = token.uuid;
+                        String json = gson.toJson(temporary_token_container);
+                        editor.putString(CONSTANT.TO_JSON, json);
+                        editor.commit();
+
                         send_tracking_post_request();
                     }
 
@@ -259,26 +368,29 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
-    //Get the data from the menu fragment
 
+    //Get the data from the menu fragment
     @Override
     public void get_message(String distance, String time) {
         userinput_distance = distance;
         userinput_time = time;
     }
 
-    //Rebot the emulator retrive the list from the share preference
 
+    //Rebot the emulator retrive the list from the share preference
     public void list_retrieve() {
-        String json = sharedpreferences.getString("tojson", null);
-        current_token_container = gson.fromJson(json, Token_Container.class);
+        String json = sharedpreferences.getString(CONSTANT.TO_JSON, null);
+        list_retrieve_token_container = gson.fromJson(json, Token_Container.class);
 
         try {
-            current_token_container.expire_days_checker();
-            System.out.println("list retrieve : " + current_token_container.print());
+            list_retrieve_token_container.expire_days_checker();
+            System.out.println("list retrieve Mine: \n" + list_retrieve_token_container.print_mine_tokens());
+            System.out.println("list retrieve Others: \n" + list_retrieve_token_container.print_others_tokens());
+
         } catch (Exception e) {
             System.out.println("it is empty");
         }
+
 
     }
 
@@ -321,26 +433,11 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             public void onClick(View view) {
                 editor.clear();
                 editor.commit();
-                temporary_token_container.clear();
+                temporary_token_container.clear_mine();
+                temporary_token_container.clear_others();
                 System.out.println("Tokens have been all clear");
             }
         });
-        token_generator.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.d("button", "trigger");
-                Log.d("Long", String.valueOf(longtitude));
-                Log.d("La", String.valueOf(longtitude));
-
-                Token token = new Token(latitude, longtitude, sedentary_begin, sedentary_end);
-                temporary_token_container.add(token);
-
-                String json = gson.toJson(temporary_token_container);
-                editor.putString(CONSTANT.TO_JSON, json);
-                editor.commit();
-            }
-        });
-
 
         Get_token.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -377,6 +474,17 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             }
         });
 
+        token_generator.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Token token = new Token(null, latitude, longtitude, sedentary_begin, sedentary_end);
+                temporary_token_container.mine_add(token);
+
+                String json = gson.toJson(temporary_token_container);
+                editor.putString(CONSTANT.TO_JSON, json);
+                editor.commit();
+            }
+        });
 
     }
     //Fragment connection
@@ -399,8 +507,14 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
+        long[] arr = new long[positive_report_date.size()];
+        int i = 0;
+        for (Long value : positive_report_date) {
+            arr[i++] = value;
+        }
+
         //create a new Date time picker fragment
-        Date_time_Picker_VIEW date_time_picker_view = Date_time_Picker_VIEW.newInstance(null, null);
+        Date_time_Picker_VIEW date_time_picker_view = Date_time_Picker_VIEW.newInstance(arr);
         fragmentTransaction.replace(R.id.fragment_container, date_time_picker_view).addToBackStack(null);
         fragmentTransaction.commit();
     }
@@ -424,11 +538,14 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             protected Map<String, String> getParams() throws AuthFailureError {
 
                 Map<String, String> params = new HashMap<String, String>();
-                params.put(CONSTANT.UUID, "tuh12085");
+
+                params.put(CONSTANT.UUID, String.valueOf(uuid));
                 params.put(CONSTANT.LATITUDE, String.valueOf(latitude));
                 params.put(CONSTANT.LONGTITUDE, String.valueOf(longtitude));
                 params.put(CONSTANT.SEDENTARY_BEGIN, String.valueOf(sedentary_begin));
                 params.put(CONSTANT.SEDENTARY_END, String.valueOf(sedentary_end));
+
+
                 Log.d("TRACKING MESSAGE", "SEND");
                 return params;
 
@@ -441,7 +558,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     public void send_tracing_post_request() {
         //POST REQUEST BEGIN
         RequestQueue postqueue = Volley.newRequestQueue(this);
-        StringRequest postquest = new StringRequest(Request.Method.POST, tracing_url,
+        StringRequest postquest = new StringRequest(Request.Method.POST, tracing_url, 
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -458,17 +575,18 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
                 Map<String, String> params = new HashMap<String, String>();
 
-                //Testing........
-                jsonArray = new JSONArray();
-                jsonArray.put("tuh12085");
-                date_long = 123456;
-                //Testing........
+                list_retrieve();
 
+                //send all my uuids
+                my_uuids_jsonArray = list_retrieve_token_container.get_all_my_uuid();
+                date_long = Instant.now().toEpochMilli();
 
-                params.put(CONSTANT.UUIDS, jsonArray.toString());
+                params.put(CONSTANT.UUIDS, my_uuids_jsonArray.toString());
                 params.put(CONSTANT.DATE, String.valueOf(date_long));
 
+
                 Log.d("TRACING MESSAGE", "SEND");
+
                 return params;
 
             }
