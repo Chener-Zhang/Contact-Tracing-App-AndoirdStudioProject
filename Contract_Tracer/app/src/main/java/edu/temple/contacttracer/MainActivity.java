@@ -35,6 +35,8 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -165,6 +167,12 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                     //otherwise report
                     else {
                         Log.d("Receive Report", tracing_json);
+                        JSONObject other_uuids_json_object = new JSONObject(tracing_json);
+                        JsonArray other_uuids = (JsonArray) other_uuids_json_object.get(CONSTANT.UUIDS);
+                        for (JsonElement id : other_uuids) {
+                            Log.d("ID", id.toString());
+                        }
+
                     }
                     //-test--------->
                 }
