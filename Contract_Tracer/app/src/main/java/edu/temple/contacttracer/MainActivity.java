@@ -114,30 +114,31 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
 
             try {
+                if (tracking_json != null) {
+                    JSONObject jsonObject = new JSONObject(tracking_json);
+                    System.out.println("\n\n-----TEST--------->");
 
-                JSONObject jsonObject = new JSONObject(tracking_json);
-                System.out.println("\n\n-----TEST--------->");
-
-                String uuid_in_string = (String) jsonObject.get(CONSTANT.UUID);
-                double latitude = jsonObject.getDouble(CONSTANT.LATITUDE);
-                double longtitude = jsonObject.getDouble(CONSTANT.LONGTITUDE);
-                long sedentary_begin = jsonObject.getLong(CONSTANT.SEDENTARY_BEGIN);
-                long sedentary_end = jsonObject.getLong(CONSTANT.SEDENTARY_END);
+                    String uuid_in_string = (String) jsonObject.get(CONSTANT.UUID);
+                    double latitude = jsonObject.getDouble(CONSTANT.LATITUDE);
+                    double longtitude = jsonObject.getDouble(CONSTANT.LONGTITUDE);
+                    long sedentary_begin = jsonObject.getLong(CONSTANT.SEDENTARY_BEGIN);
+                    long sedentary_end = jsonObject.getLong(CONSTANT.SEDENTARY_END);
 
 
-                Log.d("UUID : ", uuid_in_string);
-                UUID uuid = UUID.fromString(uuid_in_string);
+                    Log.d("UUID : ", uuid_in_string);
+                    UUID uuid = UUID.fromString(uuid_in_string);
 
-                //Token(double latitude, double longtitude, long sedentary_begin, long sedentary_end, LocalDate date)
-                Token other_tocken = new Token(uuid, latitude, longtitude, sedentary_begin, sedentary_end);
-                ALL_token_container.others_add(other_tocken);
-                ALL_token_container.discard_repeate();
+                    //Token(double latitude, double longtitude, long sedentary_begin, long sedentary_end, LocalDate date)
+                    Token other_tocken = new Token(uuid, latitude, longtitude, sedentary_begin, sedentary_end);
+                    ALL_token_container.others_add(other_tocken);
+                    ALL_token_container.discard_repeate();
 
-                String other_json = gson.toJson(ALL_token_container);
-                editor.putString(CONSTANT.TO_JSON, other_json);
-                editor.commit();
+                    String other_json = gson.toJson(ALL_token_container);
+                    editor.putString(CONSTANT.TO_JSON, other_json);
+                    editor.commit();
 
-                System.out.println("-----TEST--------->\n\n");
+                    System.out.println("-----TEST--------->\n\n");
+                }
 
 
             } catch (JSONException e) {
@@ -145,11 +146,12 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             }
 
             try {
-                Log.d("BroadcastReceiver MAIN ACTIVITIES", tracing_json);
+                if (tracing_json != null) {
+                    Log.d("BroadcastReceiver MAIN ACTIVITIES", tracing_json);
+                }
             } catch (Exception e) {
                 System.out.println(e);
             }
-
 
             Log.d("Main Activity json receive", tracking_json);
 

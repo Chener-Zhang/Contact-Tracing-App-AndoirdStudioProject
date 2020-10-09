@@ -80,10 +80,9 @@ public class FirebaseCloudMessaging extends FirebaseMessagingService {
             message_from_FCM.putExtra(CONSTANT.JSON_FROM_BROADCAST_TRACKING, tracking_json);
             message_from_FCM.putExtra(CONSTANT.MYLOCATION, mylocation);
 
-            //SEND THE BROAD CASE
-            LocalBroadcastManager.getInstance(this).sendBroadcast(message_from_FCM);
         }
-
+        //SEND THE BROAD CASE
+        LocalBroadcastManager.getInstance(this).sendBroadcast(message_from_FCM);
 
     }
 
