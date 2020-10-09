@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import static java.time.temporal.ChronoUnit.DAYS;
 
 public class Token_Container {
-    ArrayList<Token> My_tokenArrayList;
-    ArrayList<Token> Other_tokenArrayList;
-    JSONArray my_jsonArray;
+    ArrayList<Token> My_tokenArrayList = null;
+    ArrayList<Token> Other_tokenArrayList = null;
+    JSONArray my_jsonArray = null;
 
 
     public Token_Container() {
@@ -26,6 +26,7 @@ public class Token_Container {
         for (Token token : My_tokenArrayList) {
             my_jsonArray.put(token.uuid);
         }
+
         return my_jsonArray;
     }
 

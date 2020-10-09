@@ -152,20 +152,23 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             try {
                 if (tracing_json != null) {
                     Log.d("BRAOD CAST FROM TRACING TO MAIN ACTIVITIES", "RECEIVED");
-
+                    list_retrieve();
                     //-test--------->
                     JSONObject object = new JSONObject(tracing_json);
                     String all_uuids = object.get(CONSTANT.UUIDS).toString();
-                    String my_uuids = ALL_token_container.my_jsonArray.toString();
+                    String my_uuids = ALL_token_container.get_all_my_uuid().toString();
 
-                    //ignore my uuid
+//                    System.out.println("------------------------------");
+//                    System.out.println(all_uuids);
+//                    System.out.println("------------------------------");
+//                    System.out.println(my_uuids);
+//                    System.out.println("------------------------------");
+
+                    //others
                     if (!all_uuids.equals(my_uuids)) {
+
+
                         Log.d("Detected", "someone get sick");
-
-
-                    }
-                    //otherwise report
-                    else {
                         Log.d("Receive Report", tracing_json);
                         JSONObject other_uuids_json_object = new JSONObject(tracing_json);
                         JsonArray other_uuids = (JsonArray) other_uuids_json_object.get(CONSTANT.UUIDS);
@@ -173,6 +176,12 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                             Log.d("ID", id.toString());
                         }
 
+
+                    }
+                    //ignore my uuid
+                    else {
+
+                        System.out.println("\n\n you are fine \n\n");
                     }
                     //-test--------->
                 }
@@ -543,13 +552,17 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                 Map<String, String> params = new HashMap<String, String>();
 
                 list_retrieve();
+
+                //send all my uuids
                 jsonArray = list_retrieve_token_container.get_all_my_uuid();
                 date_long = LocalDate.now().toEpochDay();
 
                 params.put(CONSTANT.UUIDS, jsonArray.toString());
                 params.put(CONSTANT.DATE, String.valueOf(date_long));
 
+
                 Log.d("TRACING MESSAGE", "SEND");
+
                 return params;
 
             }
