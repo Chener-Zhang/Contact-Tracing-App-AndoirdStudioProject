@@ -13,7 +13,6 @@ public class Date_time_Picker_VIEW extends Fragment {
     private static final String ARG_PARAM2 = "param2";
 
 
-
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -49,7 +48,6 @@ public class Date_time_Picker_VIEW extends Fragment {
                              Bundle savedInstanceState) {
 
         View this_view = inflater.inflate(R.layout.fragment_time_picker_dialog, container, false);
-
 
 
         return this_view;
