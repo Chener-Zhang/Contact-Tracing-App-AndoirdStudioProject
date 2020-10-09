@@ -558,7 +558,6 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                 //send all my uuids
                 jsonArray = list_retrieve_token_container.get_all_my_uuid();
                 date_long = Instant.now().toEpochMilli();
-                //LocalDate.now().toEpochDay();
 
 
                 params.put(CONSTANT.UUIDS, jsonArray.toString());
