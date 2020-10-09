@@ -42,7 +42,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -557,7 +557,9 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
                 //send all my uuids
                 jsonArray = list_retrieve_token_container.get_all_my_uuid();
-                date_long = LocalDate.now().toEpochDay();
+                date_long = Instant.now().toEpochMilli();
+                //LocalDate.now().toEpochDay();
+
 
                 params.put(CONSTANT.UUIDS, jsonArray.toString());
                 params.put(CONSTANT.DATE, String.valueOf(date_long));
