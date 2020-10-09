@@ -150,6 +150,19 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             try {
                 if (tracing_json != null) {
                     Log.d("BRAOD CAST FROM TRACING TO MAIN ACTIVITIES", "RECEIVED");
+
+                    //-test--------->
+                    JSONObject object = new JSONObject(tracing_json);
+                    String all_uuids = object.get(CONSTANT.UUIDS).toString();
+                    String my_uuids = ALL_token_container.my_jsonArray.toString();
+
+                    //ignore my uuid
+                    if (!all_uuids.equals(my_uuids)) {
+                        Log.d("Detected", "someone get sick");
+
+
+                    }
+                    //-test--------->
                 }
             } catch (Exception e) {
                 System.out.println(e);
