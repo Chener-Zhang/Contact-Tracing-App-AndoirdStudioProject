@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 
 import java.util.Arrays;
+import java.util.Calendar;
 
 
 public class Date_time_Picker_VIEW extends Fragment {
@@ -58,13 +59,36 @@ public class Date_time_Picker_VIEW extends Fragment {
         textView = view.findViewById(R.id.test_result);
         calendar = view.findViewById(R.id.my_calendar);
 
+
         calendar.setOnDateChangedListener(new DatePicker.OnDateChangedListener() {
             @Override
             public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                 System.out.println("date changed");
+                if (show_Positive_dates(year, monthOfYear, dayOfMonth)) {
+                    textView.setText("SOME ONE GET SICK");
+                }
             }
         });
         return view;
+    }
+
+    public boolean show_Positive_dates(int the_year, int the_month, int the_date) {
+        Calendar calendar = Calendar.getInstance();
+        int date;
+        int month;
+        int year;
+
+        for (long l : positive_dates) {
+            long milliSeconds = l;
+            calendar.setTimeInMillis(milliSeconds);
+            date = calendar.get(Calendar.DATE);
+            month = calendar.get(Calendar.MONTH);
+            year = calendar.get(Calendar.YEAR);
+            if (date == the_date && the_year == year && the_month == month) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
