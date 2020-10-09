@@ -38,6 +38,8 @@ public class FirebaseCloudMessaging extends FirebaseMessagingService {
 
         if (remoteMessage.getFrom().equals("/topics/TRACING")) {
 
+
+            //remove this line later
             Log.d("FCM Data From Tracing: ", tracing_json);
 
             message_from_FCM.putExtra(CONSTANT.JSON_FROM_BROADCAST_TRACING, tracing_json);

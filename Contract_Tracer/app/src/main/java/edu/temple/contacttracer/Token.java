@@ -27,6 +27,7 @@ public class Token {
         this.sedentary_end = sedentary_end;
         this.date = getDate();
 
+
     }
 
 

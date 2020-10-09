@@ -1,12 +1,12 @@
 package edu.temple.contacttracer;
 
+import android.location.Location;
 import android.util.Log;
 
 import org.json.JSONArray;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.UUID;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
@@ -30,7 +30,6 @@ public class Token_Container {
     }
 
     public void discard_repeate() {
-
         for (Token my_token : My_tokenArrayList) {
             for (Token other_token : Other_tokenArrayList) {
                 if (String.valueOf(my_token.uuid).equals(String.valueOf(other_token.uuid))) {
@@ -40,17 +39,42 @@ public class Token_Container {
         }
     }
 
-    public Token get_my_token(UUID my_uuid) {
-        Token return_value = null;
-        for (Token token : My_tokenArrayList) {
-            if (token.uuid == my_uuid) {
-                return_value = token;
-            } else {
-                return_value = null;
+    //check if you expose to virus;
+    public boolean matching(String id) {
+        ArrayList<Token> currentArrayList = new ArrayList<Token>();
+        double between_distance = 10;
+        for (Token token : Other_tokenArrayList) {
+            if (token.uuid.toString().equals(id)) {
+                currentArrayList.add(token);
             }
         }
-        return return_value;
+        if (!currentArrayList.isEmpty()) {
+            for (Token mytoken : My_tokenArrayList) {
+                for (Token histoken : currentArrayList) {
+                    if (Math.round(distance_calculator(mytoken.latitude, histoken.latitude, mytoken.longtitude, histoken.longtitude)) < between_distance) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
+
+
+    //Use the formular online
+    public float distance_calculator(double latitudeA, double latitudeB, double longtitudeA, double longtitudeB) {
+        Location A = new Location("A");
+        Location B = new Location("B");
+
+        A.setLatitude(latitudeA);
+        B.setLatitude(latitudeB);
+        A.setLongitude(longtitudeA);
+        B.setLongitude(longtitudeB);
+        float distance = A.distanceTo(B);
+
+        return distance;
+    }
+
 
     // add
     public void mine_add(Token token) {
@@ -65,10 +89,6 @@ public class Token_Container {
     //remove
     public void mine_remove(Token token) {
         My_tokenArrayList.remove(token);
-    }
-
-    public void other_remove(Token token) {
-        Other_tokenArrayList.remove(token);
     }
 
 

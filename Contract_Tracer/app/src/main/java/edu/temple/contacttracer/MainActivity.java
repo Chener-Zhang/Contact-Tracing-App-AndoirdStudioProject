@@ -159,8 +159,12 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                     //ignore my uuid
                     if (!all_uuids.equals(my_uuids)) {
                         Log.d("Detected", "someone get sick");
-                        
 
+
+                    }
+                    //otherwise report
+                    else {
+                        Log.d("Receive Report", tracing_json);
                     }
                     //-test--------->
                 }
@@ -530,8 +534,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
                 Map<String, String> params = new HashMap<String, String>();
 
-
-                jsonArray = ALL_token_container.get_all_my_uuid();
+                list_retrieve();
+                jsonArray = list_retrieve_token_container.get_all_my_uuid();
                 date_long = LocalDate.now().toEpochDay();
 
                 params.put(CONSTANT.UUIDS, jsonArray.toString());
