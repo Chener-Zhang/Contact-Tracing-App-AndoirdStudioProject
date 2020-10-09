@@ -43,6 +43,7 @@ import org.json.JSONObject;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -68,13 +69,14 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
     //URL
     public static String tracking_url = "https://kamorris.com/lab/ct_tracking.php";
+    public static String tracing_url = "https://kamorris.com/lab/ct_tracing.php";
+
     //Dynamic Variable;
     public UUID uuid;
     public double longtitude;
     public double latitude;
     public long sedentary_begin;
     public long sedentary_end;
-    public static String tracing_url = "https://kamorris.com/lab/ct_tracing.php";
     public MenuItem date_picker;
     public Button get_sick_button;
 
@@ -114,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
 
     //Date for positive report
-    ArrayList<Long> positive_report_date;
+    List<Long> positive_report_date;
 
 
     //Receive the message from the FCM class . Include Tracking and Tracing message
@@ -154,7 +156,6 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
             //Retrieve tracing FCM message
             try {
                 if (tracing_json != null) {
@@ -167,6 +168,10 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
                     others_tracing_uuids_jsonArray = filter_uuids_return_other(my_uuids_jsonArray, all_uuids_jsonAray);
 
+                    //add the positive date to the calendar fragment
+                    positive_report_date.add((Long) object.get(CONSTANT.DATE));
+
+                    Log.d("POSITIVE_REPORT_DATE", positive_report_date.toString());
 
                 }
             } catch (Exception e) {
@@ -231,6 +236,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         //init Firebase Cloud Messaging
         firebase_intent = new Intent(this, FirebaseCloudMessaging.class);
 
+        //init others dates
+        positive_report_date = new ArrayList<Long>();
 
         //Set button and click listener
         button_init();
@@ -500,8 +507,14 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
+        long[] arr = new long[positive_report_date.size()];
+        int i = 0;
+        for (Long value : positive_report_date) {
+            arr[i++] = value;
+        }
+
         //create a new Date time picker fragment
-        Date_time_Picker_VIEW date_time_picker_view = Date_time_Picker_VIEW.newInstance(null, null);
+        Date_time_Picker_VIEW date_time_picker_view = Date_time_Picker_VIEW.newInstance(arr);
         fragmentTransaction.replace(R.id.fragment_container, date_time_picker_view).addToBackStack(null);
         fragmentTransaction.commit();
     }

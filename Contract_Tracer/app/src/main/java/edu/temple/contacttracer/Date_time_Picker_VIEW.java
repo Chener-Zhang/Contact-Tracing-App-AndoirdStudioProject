@@ -1,21 +1,23 @@
 package edu.temple.contacttracer;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 
+import java.util.Arrays;
+
 
 public class Date_time_Picker_VIEW extends Fragment {
     private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private long[] positive_dates;
+
 
     public Date_time_Picker_VIEW() {
         // Required empty public constructor
@@ -23,11 +25,11 @@ public class Date_time_Picker_VIEW extends Fragment {
 
 
     // TODO: Rename and change types and number of parameters
-    public static Date_time_Picker_VIEW newInstance(String param1, String param2) {
+    public static Date_time_Picker_VIEW newInstance(long[] param1) {
         Date_time_Picker_VIEW fragment = new Date_time_Picker_VIEW();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putLongArray(ARG_PARAM1, param1);
+
         fragment.setArguments(args);
         return fragment;
     }
@@ -36,8 +38,8 @@ public class Date_time_Picker_VIEW extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            positive_dates = getArguments().getLongArray(ARG_PARAM1);
+            Log.d("REICEVE long[]", Arrays.toString(positive_dates));
         }
 
 
