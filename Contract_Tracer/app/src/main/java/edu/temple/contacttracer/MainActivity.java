@@ -507,16 +507,9 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
                 Map<String, String> params = new HashMap<String, String>();
 
-                //Testing........
-                jsonArray = new JSONArray();
-                if (uuid == null) {
-                    uuid = UUID.randomUUID();
-                }
-                jsonArray.put(uuid);
 
+                jsonArray = ALL_token_container.get_all_my_uuid();
                 date_long = LocalDate.now().toEpochDay();
-                //Testing........
-
 
                 params.put(CONSTANT.UUIDS, jsonArray.toString());
                 params.put(CONSTANT.DATE, String.valueOf(date_long));

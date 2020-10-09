@@ -27,6 +27,7 @@ public class FirebaseCloudMessaging extends FirebaseMessagingService {
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
         if (remoteMessage.getFrom().equals("/topics/TRACING")) {
+
             Log.d("Tracing ", "Data Received");
             String json = remoteMessage.getData().get("payload");
 //            Log.d("FCM Data From Tracing: ", json);
@@ -34,10 +35,7 @@ public class FirebaseCloudMessaging extends FirebaseMessagingService {
             try {
                 JSONObject jsonObject = new JSONObject(json);
 
-
                 Log.d("FROM TRACING", jsonObject.toString());
-
-                Log.d("GET THE UUIDS:", jsonObject.getJSONArray("uuids").toString());
 
 
             } catch (JSONException e) {

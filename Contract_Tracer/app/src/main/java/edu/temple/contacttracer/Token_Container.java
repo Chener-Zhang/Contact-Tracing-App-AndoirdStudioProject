@@ -2,6 +2,8 @@ package edu.temple.contacttracer;
 
 import android.util.Log;
 
+import org.json.JSONArray;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -11,11 +13,20 @@ import static java.time.temporal.ChronoUnit.DAYS;
 public class Token_Container {
     ArrayList<Token> My_tokenArrayList;
     ArrayList<Token> Other_tokenArrayList;
+    JSONArray my_jsonArray;
 
 
     public Token_Container() {
         My_tokenArrayList = new ArrayList<Token>();
         Other_tokenArrayList = new ArrayList<Token>();
+        my_jsonArray = new JSONArray();
+    }
+
+    public JSONArray get_all_my_uuid() {
+        for (Token token : My_tokenArrayList) {
+            my_jsonArray.put(token.uuid);
+        }
+        return my_jsonArray;
     }
 
     public void discard_repeate() {
