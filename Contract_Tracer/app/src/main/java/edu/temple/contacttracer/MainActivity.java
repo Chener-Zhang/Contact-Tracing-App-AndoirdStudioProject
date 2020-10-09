@@ -107,12 +107,15 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     BroadcastReceiver FCM_BroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String json = intent.getStringExtra("json_file");
+            String tracking_json = intent.getStringExtra(CONSTANT.JSON_FROM_BROADCAST_TRACKING);
+            String tracing_json = intent.getStringExtra(CONSTANT.JSON_FROM_BROADCAST_TRACING);
+
             mylocation = intent.getStringExtra(CONSTANT.MYLOCATION);
+
+
             try {
 
-
-                JSONObject jsonObject = new JSONObject(json);
+                JSONObject jsonObject = new JSONObject(tracking_json);
                 System.out.println("\n\n-----TEST--------->");
 
                 String uuid_in_string = (String) jsonObject.get(CONSTANT.UUID);
@@ -141,7 +144,14 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                 e.printStackTrace();
             }
 
-            Log.d("Main Activity json receive", json);
+            try {
+                Log.d("BroadcastReceiver MAIN ACTIVITIES", tracing_json);
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+
+
+            Log.d("Main Activity json receive", tracking_json);
 
         }
     };

@@ -29,26 +29,25 @@ public class FirebaseCloudMessaging extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
-        if (remoteMessage.getFrom().equals("/topics/TRACING")) {
 
-            Log.d("Tracing ", "Data Received");
-            tracing_json = remoteMessage.getData().get("payload");
+        //Get datas
+        Intent message_from_FCM = new Intent(getPackageName() + ".CHAT_MESSAGE");
+        tracking_json = remoteMessage.getData().get("payload");
+        tracing_json = remoteMessage.getData().get("payload");
+
+
+        if (remoteMessage.getFrom().equals("/topics/TRACING")) {
 
             try {
                 JSONObject jsonObject = new JSONObject(tracing_json);
-
                 Log.d("FROM TRACING", jsonObject.toString());
-
-
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
+            message_from_FCM.putExtra(CONSTANT.JSON_FROM_BROADCAST_TRACING, tracing_json);
 
         } else {
-            //Get datas
-            tracking_json = remoteMessage.getData().get("payload");
-
             if (remoteMessage.getNotification() != null) {
                 Log.d("RemoteMessage not equal to null FCM Notification", remoteMessage.getNotification().getBody());
 
@@ -77,10 +76,10 @@ public class FirebaseCloudMessaging extends FirebaseMessagingService {
                 }
             }
 
-            Intent message_from_FCM = new Intent(getPackageName() + ".CHAT_MESSAGE");
             //PASS THE DATA TO INTENT
-            message_from_FCM.putExtra(CONSTANT.JSON_FROM_BROADCAST, tracking_json);
+            message_from_FCM.putExtra(CONSTANT.JSON_FROM_BROADCAST_TRACKING, tracking_json);
             message_from_FCM.putExtra(CONSTANT.MYLOCATION, mylocation);
+
             //SEND THE BROAD CASE
             LocalBroadcastManager.getInstance(this).sendBroadcast(message_from_FCM);
         }
