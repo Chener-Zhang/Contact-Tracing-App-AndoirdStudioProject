@@ -13,8 +13,17 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="28dp"
-        android:layout_marginTop="26dp"
+        android:layout_marginTop="23dp"
         android:layout_marginEnd="34dp"
         android:datePickerMode="calendar" />
+
+    <TextView
+        android:id="@+id/test_result"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_below="@+id/my_calendar"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="75dp"
+        android:layout_marginBottom="94dp" />
 
 </RelativeLayout>

@@ -5,6 +5,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
@@ -14,10 +16,13 @@ import java.util.Arrays;
 public class Date_time_Picker_VIEW extends Fragment {
     private static final String ARG_PARAM1 = "param1";
 
-
     // TODO: Rename and change types of parameters
     private long[] positive_dates;
 
+
+    DatePicker calendar;
+    TextView textView;
+    View view;
 
     public Date_time_Picker_VIEW() {
         // Required empty public constructor
@@ -29,7 +34,6 @@ public class Date_time_Picker_VIEW extends Fragment {
         Date_time_Picker_VIEW fragment = new Date_time_Picker_VIEW();
         Bundle args = new Bundle();
         args.putLongArray(ARG_PARAM1, param1);
-
         fragment.setArguments(args);
         return fragment;
     }
@@ -49,9 +53,19 @@ public class Date_time_Picker_VIEW extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View this_view = inflater.inflate(R.layout.fragment_time_picker_dialog, container, false);
+        view = inflater.inflate(R.layout.fragment_time_picker_dialog, container, false);
 
+        textView = view.findViewById(R.id.test_result);
+        calendar = view.findViewById(R.id.my_calendar);
 
-        return this_view;
+        calendar.setOnDateChangedListener(new DatePicker.OnDateChangedListener() {
+            @Override
+            public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                System.out.println("date changed");
+            }
+        });
+        return view;
     }
+
+
 }
