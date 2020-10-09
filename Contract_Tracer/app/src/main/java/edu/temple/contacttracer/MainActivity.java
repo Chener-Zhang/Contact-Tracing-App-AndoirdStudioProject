@@ -102,8 +102,15 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     //JsonArray UUIDS and long DATE
     JSONArray jsonArray;
     long date_long;
+
+
     //Receiver
     public BroadcastReceiver broadcastReceiver;
+
+    //FCM Broad Cast Receiver
+    IntentFilter FCM_IntentFilter;
+
+
     BroadcastReceiver FCM_BroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -112,11 +119,9 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
             mylocation = intent.getStringExtra(CONSTANT.MYLOCATION);
 
-
             try {
                 if (tracking_json != null) {
                     JSONObject jsonObject = new JSONObject(tracking_json);
-                    System.out.println("\n\n-----TEST--------->");
 
                     String uuid_in_string = (String) jsonObject.get(CONSTANT.UUID);
                     double latitude = jsonObject.getDouble(CONSTANT.LATITUDE);
@@ -124,8 +129,6 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                     long sedentary_begin = jsonObject.getLong(CONSTANT.SEDENTARY_BEGIN);
                     long sedentary_end = jsonObject.getLong(CONSTANT.SEDENTARY_END);
 
-
-                    Log.d("UUID : ", uuid_in_string);
                     UUID uuid = UUID.fromString(uuid_in_string);
 
                     //Token(double latitude, double longtitude, long sedentary_begin, long sedentary_end, LocalDate date)
@@ -137,7 +140,6 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                     editor.putString(CONSTANT.TO_JSON, other_json);
                     editor.commit();
 
-                    System.out.println("-----TEST--------->\n\n");
                 }
 
 
@@ -147,18 +149,14 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
             try {
                 if (tracing_json != null) {
-                    Log.d("BroadcastReceiver MAIN ACTIVITIES", tracing_json);
+                    Log.d("BRAOD CAST FROM TRACING TO MAIN ACTIVITIES", "RECEIVED");
                 }
             } catch (Exception e) {
                 System.out.println(e);
             }
 
-            Log.d("Main Activity json receive", tracking_json);
-
         }
     };
-    //FCM Broad Cast Receiver
-    IntentFilter FCM_IntentFilter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
