@@ -558,7 +558,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     public void send_tracing_post_request() {
         //POST REQUEST BEGIN
         RequestQueue postqueue = Volley.newRequestQueue(this);
-        StringRequest postquest = new StringRequest(Request.Method.POST, tracing_url,
+        StringRequest postquest = new StringRequest(Request.Method.POST, tracing_url, 
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
