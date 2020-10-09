@@ -17,6 +17,9 @@ public class FirebaseCloudMessaging extends FirebaseMessagingService {
 
 
     public String mylocation;
+    public String tracking_json;
+    public String tracing_json;
+
 
     @Override
     public void onNewToken(@NonNull String s) {
@@ -28,48 +31,53 @@ public class FirebaseCloudMessaging extends FirebaseMessagingService {
         super.onMessageReceived(remoteMessage);
 
         //Get datas
-        String json = remoteMessage.getData().get("payload");
+        Intent message_from_FCM = new Intent(getPackageName() + ".CHAT_MESSAGE");
+        tracking_json = remoteMessage.getData().get("payload");
+        tracing_json = remoteMessage.getData().get("payload");
 
-        if (remoteMessage.getNotification() != null) {
-            Log.d("RemoteMessage not equal to null FCM Notification", remoteMessage.getNotification().getBody());
+
+        if (remoteMessage.getFrom().equals("/topics/TRACING")) {
+
+
+            //remove this line later
+            Log.d("FCM Data From Tracing: ", tracing_json);
+
+            message_from_FCM.putExtra(CONSTANT.JSON_FROM_BROADCAST_TRACING, tracing_json);
 
         } else {
-            try {
-                Log.d("FCM Data: ", json);
-                JSONObject jsonObject = new JSONObject(json);
+            if (remoteMessage.getNotification() != null) {
+                Log.d("RemoteMessage not equal to null FCM Notification", remoteMessage.getNotification().getBody());
 
+            } else {
                 try {
-                    String other_uuid = jsonObject.getString(CONSTANT.UUID);
-                    double other_latitude = Double.parseDouble(jsonObject.getString(CONSTANT.LATITUDE));
-                    double other_longtitude = Double.parseDouble(jsonObject.getString(CONSTANT.LONGTITUDE));
-                    long other_sedentary_begin = Long.parseLong(jsonObject.getString(CONSTANT.SEDENTARY_BEGIN));
-                    long other_sedentary_end = Long.parseLong(jsonObject.getString(CONSTANT.SEDENTARY_END));
+                    Log.d("FCM Data From Tracking: ", tracking_json);
+                    JSONObject jsonObject = new JSONObject(tracking_json);
 
-                    //Check with if uuid is my from the server
-                    if (other_uuid == CONSTANT.MY_UUID) {
-                        mylocation = json;
-                        Log.d("other_uuid == CONSTANT.MY_UUID", mylocation);
-                    } else {
-                        mylocation = "mylocation not list here";
+                    try {
+                        String other_uuid = jsonObject.getString(CONSTANT.UUID);
+                        //Check with if uuid is my from the server
+                        if (other_uuid == CONSTANT.MY_UUID) {
+                            mylocation = tracking_json;
+                            Log.d("other_uuid == CONSTANT.MY_UUID", mylocation);
+                        } else {
+                            mylocation = "mylocation not list here";
+                        }
+                    } catch (Exception e) {
+                        Log.d("Error  ", "Somebody sending something else than REGULAR imformation");
+                        Log.d("Error  ", e.toString());
                     }
 
-
-                } catch (Exception e) {
-                    Log.d("Error  ", "Somebody sending something else than REGULAR imformation");
-                    Log.d("Error  ", e.toString());
+                    System.out.println(jsonObject.toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-
-                System.out.println(jsonObject.toString());
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
+
+            //PASS THE DATA TO INTENT
+            message_from_FCM.putExtra(CONSTANT.JSON_FROM_BROADCAST_TRACKING, tracking_json);
+            message_from_FCM.putExtra(CONSTANT.MYLOCATION, mylocation);
+
         }
-
-
-        Intent message_from_FCM = new Intent(getPackageName() + ".CHAT_MESSAGE");
-        //PASS THE DATA TO INTENT
-        message_from_FCM.putExtra(CONSTANT.JSON_FROM_BROADCAST, json);
-        message_from_FCM.putExtra(CONSTANT.MYLOCATION, mylocation);
         //SEND THE BROAD CASE
         LocalBroadcastManager.getInstance(this).sendBroadcast(message_from_FCM);
 
