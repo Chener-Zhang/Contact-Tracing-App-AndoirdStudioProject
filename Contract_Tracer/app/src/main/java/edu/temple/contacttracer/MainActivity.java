@@ -170,8 +170,10 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
                         Log.d("Detected", "someone get sick");
                         Log.d("Receive Report", tracing_json);
+
                         JSONObject other_uuids_json_object = new JSONObject(tracing_json);
                         JsonArray other_uuids = (JsonArray) other_uuids_json_object.get(CONSTANT.UUIDS);
+
                         for (JsonElement id : other_uuids) {
                             Log.d("ID", id.toString());
                         }
