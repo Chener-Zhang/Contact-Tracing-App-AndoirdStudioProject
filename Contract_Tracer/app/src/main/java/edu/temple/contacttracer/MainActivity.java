@@ -189,8 +189,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             other_list.add(others_uuids.get(i).toString());
         }
         System.out.println("\n\n------------------------------------------------\n\n");
-        Log.d("ALL UUIDS", mine_list.toString());
-        Log.d("Mine UUIDS", other_list.toString());
+        Log.d("ALL UUIDS", other_list.toString());
+        Log.d("Mine UUIDS", mine_list.toString());
         System.out.println("\n\n------------------------------------------------\n\n");
         //remove repetition
         other_list.removeAll(mine_list);
