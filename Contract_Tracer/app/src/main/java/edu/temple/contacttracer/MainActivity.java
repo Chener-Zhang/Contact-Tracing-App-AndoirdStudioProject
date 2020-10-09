@@ -35,8 +35,6 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -89,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
 
     //Token
-    Token_Container ALL_token_container;
+    Token_Container temporary_token_container;
     Token_Container list_retrieve_token_container;
 
     //Gson
@@ -103,7 +101,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     String mylocation;
 
     //JsonArray UUIDS and long DATE
-    JSONArray jsonArray;
+    JSONArray others_tracing_uuids_jsonArray;
+    JSONArray my_uuids_jsonArray;
     long date_long;
 
 
@@ -117,8 +116,9 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     //Date for positive report
     ArrayList<Long> positive_report_date;
 
+
     //Receive the message from the FCM class . Include Tracking and Tracing message
-    BroadcastReceiver FCM_BroadcastReceiver = new BroadcastReceiver() {
+    final BroadcastReceiver FCM_BroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String tracking_json = intent.getStringExtra(CONSTANT.JSON_FROM_BROADCAST_TRACKING);
@@ -141,10 +141,10 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
                     //Token(double latitude, double longtitude, long sedentary_begin, long sedentary_end, LocalDate date)
                     Token other_tocken = new Token(uuid, latitude, longtitude, sedentary_begin, sedentary_end);
-                    ALL_token_container.others_add(other_tocken);
-                    ALL_token_container.discard_repeate();
+                    temporary_token_container.others_add(other_tocken);
+                    temporary_token_container.discard_repeate();
 
-                    String other_json = gson.toJson(ALL_token_container);
+                    String other_json = gson.toJson(temporary_token_container);
                     editor.putString(CONSTANT.TO_JSON, other_json);
                     editor.commit();
 
@@ -159,43 +159,49 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             try {
                 if (tracing_json != null) {
                     Log.d("BRAOD CAST FROM TRACING TO MAIN ACTIVITIES", "RECEIVED");
+
                     list_retrieve();
-                    //-test--------->
+
                     JSONObject object = new JSONObject(tracing_json);
-                    String all_uuids = object.get(CONSTANT.UUIDS).toString();
-                    String my_uuids = ALL_token_container.get_all_my_uuid().toString();
+                    JSONArray all_uuids_jsonAray = object.getJSONArray(CONSTANT.UUIDS);
 
-                    System.out.println("------------------------------");
-                    System.out.println(all_uuids);
-                    System.out.println("------------------------------");
-                    System.out.println(my_uuids);
-                    System.out.println("------------------------------");
+                    others_tracing_uuids_jsonArray = filter_uuids_return_other(my_uuids_jsonArray, all_uuids_jsonAray);
 
-                    //check if the report is mine. in this case, the report is from others
-                    if (!all_uuids.equals(my_uuids)) {
-                        Log.d("Detected", "someone get sick");
-                        Log.d("Receive Report", tracing_json);
 
-                        JSONObject other_uuids_json_object = new JSONObject(tracing_json);
-                        JsonArray other_uuids = (JsonArray) other_uuids_json_object.get(CONSTANT.UUIDS);
-
-                        for (JsonElement id : other_uuids) {
-                            Log.d("ID", id.toString());
-                        }
-                    }
-                    //ignore my uuid
-                    else {
-
-                        System.out.println("\n\n you are fine \n\n");
-                    }
-                    //-test--------->
                 }
             } catch (Exception e) {
                 System.out.println(e);
             }
-
         }
     };
+
+    public JSONArray filter_uuids_return_other(JSONArray mine_uuids, JSONArray others_uuids) throws JSONException {
+        JSONArray return_values = new JSONArray();
+
+
+        ArrayList<String> mine_list = new ArrayList<String>();
+        ArrayList<String> other_list = new ArrayList<String>();
+
+        for (int i = 0; i < mine_uuids.length(); i++) {
+            mine_list.add(mine_uuids.get(i).toString());
+        }
+        for (int i = 0; i < others_uuids.length(); i++) {
+            other_list.add(others_uuids.get(i).toString());
+        }
+        System.out.println("\n\n------------------------------------------------\n\n");
+        Log.d("ALL UUIDS", mine_list.toString());
+        Log.d("Mine UUIDS", other_list.toString());
+        System.out.println("\n\n------------------------------------------------\n\n");
+        //remove repetition
+        other_list.removeAll(mine_list);
+
+        //maybe require convert string to uuid
+        for (String s : other_list) {
+            return_values.put(UUID.fromString(s));
+        }
+        Log.d("RETURN VALUE AFTER FILTER", return_values.toString());
+        return return_values;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -209,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         editor = sharedpreferences.edit();
 
         //init Token container
-        ALL_token_container = new Token_Container();
+        temporary_token_container = new Token_Container();
         list_retrieve_token_container = new Token_Container();
 
         //init toolbar init
@@ -272,9 +278,9 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                     //If stop moving -> send the a post request
                     if (stop_moving) {
                         Token token = new Token(null, latitude, longtitude, sedentary_begin, sedentary_end);
-                        ALL_token_container.mine_add(token);
+                        temporary_token_container.mine_add(token);
                         uuid = token.uuid;
-                        String json = gson.toJson(ALL_token_container);
+                        String json = gson.toJson(temporary_token_container);
                         editor.putString(CONSTANT.TO_JSON, json);
                         editor.commit();
 
@@ -420,8 +426,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             public void onClick(View view) {
                 editor.clear();
                 editor.commit();
-                ALL_token_container.clear_mine();
-                ALL_token_container.clear_others();
+                temporary_token_container.clear_mine();
+                temporary_token_container.clear_others();
                 System.out.println("Tokens have been all clear");
             }
         });
@@ -465,9 +471,9 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             @Override
             public void onClick(View view) {
                 Token token = new Token(null, latitude, longtitude, sedentary_begin, sedentary_end);
-                ALL_token_container.mine_add(token);
+                temporary_token_container.mine_add(token);
 
-                String json = gson.toJson(ALL_token_container);
+                String json = gson.toJson(temporary_token_container);
                 editor.putString(CONSTANT.TO_JSON, json);
                 editor.commit();
             }
@@ -559,10 +565,10 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                 list_retrieve();
 
                 //send all my uuids
-                jsonArray = list_retrieve_token_container.get_all_my_uuid();
+                my_uuids_jsonArray = list_retrieve_token_container.get_all_my_uuid();
                 date_long = Instant.now().toEpochMilli();
 
-                params.put(CONSTANT.UUIDS, jsonArray.toString());
+                params.put(CONSTANT.UUIDS, my_uuids_jsonArray.toString());
                 params.put(CONSTANT.DATE, String.valueOf(date_long));
 
 
