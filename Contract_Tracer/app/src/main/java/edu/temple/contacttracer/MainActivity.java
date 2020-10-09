@@ -43,6 +43,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -113,6 +114,10 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     IntentFilter FCM_IntentFilter;
 
 
+    //Date for positive report
+    ArrayList<Long> positive_report_date;
+
+    //Receive the message from the FCM class . Include Tracking and Tracing message
     BroadcastReceiver FCM_BroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -121,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
             mylocation = intent.getStringExtra(CONSTANT.MYLOCATION);
 
+            //Retrieve tracking FCM message;
             try {
                 if (tracking_json != null) {
                     JSONObject jsonObject = new JSONObject(tracking_json);
@@ -149,6 +155,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                 e.printStackTrace();
             }
 
+            //Retrieve tracing FCM message
             try {
                 if (tracing_json != null) {
                     Log.d("BRAOD CAST FROM TRACING TO MAIN ACTIVITIES", "RECEIVED");
@@ -158,16 +165,14 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                     String all_uuids = object.get(CONSTANT.UUIDS).toString();
                     String my_uuids = ALL_token_container.get_all_my_uuid().toString();
 
-//                    System.out.println("------------------------------");
-//                    System.out.println(all_uuids);
-//                    System.out.println("------------------------------");
-//                    System.out.println(my_uuids);
-//                    System.out.println("------------------------------");
+                    System.out.println("------------------------------");
+                    System.out.println(all_uuids);
+                    System.out.println("------------------------------");
+                    System.out.println(my_uuids);
+                    System.out.println("------------------------------");
 
-                    //others
+                    //check if the report is mine. in this case, the report is from others
                     if (!all_uuids.equals(my_uuids)) {
-
-
                         Log.d("Detected", "someone get sick");
                         Log.d("Receive Report", tracing_json);
 
@@ -177,8 +182,6 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                         for (JsonElement id : other_uuids) {
                             Log.d("ID", id.toString());
                         }
-
-
                     }
                     //ignore my uuid
                     else {
@@ -352,16 +355,16 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
-    //Get the data from the menu fragment
 
+    //Get the data from the menu fragment
     @Override
     public void get_message(String distance, String time) {
         userinput_distance = distance;
         userinput_time = time;
     }
 
-    //Rebot the emulator retrive the list from the share preference
 
+    //Rebot the emulator retrive the list from the share preference
     public void list_retrieve() {
         String json = sharedpreferences.getString(CONSTANT.TO_JSON, null);
         list_retrieve_token_container = gson.fromJson(json, Token_Container.class);
@@ -558,7 +561,6 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                 //send all my uuids
                 jsonArray = list_retrieve_token_container.get_all_my_uuid();
                 date_long = Instant.now().toEpochMilli();
-
 
                 params.put(CONSTANT.UUIDS, jsonArray.toString());
                 params.put(CONSTANT.DATE, String.valueOf(date_long));
