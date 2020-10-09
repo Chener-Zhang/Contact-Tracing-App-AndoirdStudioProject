@@ -159,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                     //ignore my uuid
                     if (!all_uuids.equals(my_uuids)) {
                         Log.d("Detected", "someone get sick");
-
+                        
 
                     }
                     //-test--------->
