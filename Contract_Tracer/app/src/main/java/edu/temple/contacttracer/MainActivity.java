@@ -150,6 +150,10 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                     temporary_token_container.others_add(other_tocken);
                     temporary_token_container.discard_repeate();
 
+                    String json = gson.toJson(temporary_token_container);
+                    editor.putString(CONSTANT.TO_JSON, json);
+                    editor.commit();
+
                 }
 
 
@@ -305,6 +309,10 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                         temporary_token_container.mine_add(token);
                         uuid = token.uuid;
 
+                        String json = gson.toJson(temporary_token_container);
+                        editor.putString(CONSTANT.TO_JSON, json);
+                        editor.commit();
+
                         send_tracking_post_request();
                     }
 
@@ -356,8 +364,6 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         } else {
             String save_file = gson.toJson(temporary_token_container);
             editor.putString(CONSTANT.TO_JSON, save_file);
-            issave = true;
-            editor.putBoolean(CONSTANT.SAVED, issave);
             editor.commit();
             Log.d("SUCCESS", "YOU SAVE THE FILE");
         }
@@ -376,12 +382,9 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         } else {
             String save_file = gson.toJson(temporary_token_container);
             editor.putString(CONSTANT.TO_JSON, save_file);
-            issave = true;
-            editor.putBoolean(CONSTANT.SAVED, issave);
             editor.commit();
             Log.d("SUCCESS", "YOU SAVE THE FILE");
         }
-
     }
 
 
@@ -422,7 +425,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         try {
             list_retrieve_token_container = gson.fromJson(restore_data, Token_Container.class);
             list_retrieve_token_container.expire_days_checker();
-
+            temporary_token_container = list_retrieve_token_container;
         } catch (Exception e) {
             System.out.println("CONTAINER EMPTY");
         }
