@@ -48,6 +48,7 @@ public class Location_Service extends Service {
     //isMoving
     public boolean stop_moving = false;
 
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {

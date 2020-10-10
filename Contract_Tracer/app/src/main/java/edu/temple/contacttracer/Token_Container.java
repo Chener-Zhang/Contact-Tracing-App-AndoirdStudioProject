@@ -34,32 +34,14 @@ public class Token_Container {
         for (Token my_token : My_tokenArrayList) {
             for (Token other_token : Other_tokenArrayList) {
                 if (String.valueOf(my_token.uuid).equals(String.valueOf(other_token.uuid))) {
+
                     Other_tokenArrayList.remove(other_token);
+
                 }
             }
         }
     }
 
-    //check if you expose to virus;
-    public boolean matching(String id) {
-        ArrayList<Token> currentArrayList = new ArrayList<Token>();
-        double between_distance = 10;
-        for (Token token : Other_tokenArrayList) {
-            if (token.uuid.toString().equals(id)) {
-                currentArrayList.add(token);
-            }
-        }
-        if (!currentArrayList.isEmpty()) {
-            for (Token mytoken : My_tokenArrayList) {
-                for (Token histoken : currentArrayList) {
-                    if (Math.round(distance_calculator(mytoken.latitude, histoken.latitude, mytoken.longtitude, histoken.longtitude)) < between_distance) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
 
 
     //Use the formular online

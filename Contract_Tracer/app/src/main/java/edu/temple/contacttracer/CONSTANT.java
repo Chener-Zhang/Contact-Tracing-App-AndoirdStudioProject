@@ -12,7 +12,7 @@ public class CONSTANT {
     public static final String JSON_FROM_BROADCAST_TRACING = "tracing_json_file";
     public static final String MYLOCATION = "mylocation";
     public static final String MyPREFERENCES = "MyPrefs";
-
+    public static final String SAVED = "saved";
 
     //UUID IMFORMATIONS
     public static final String UUID = "uuid";
@@ -23,7 +23,6 @@ public class CONSTANT {
     public static final String SEDENTARY_BEGIN = "sedentary_begin";
     public static final String SEDENTARY_END = "sedentary_end";
     public static final String DATE = "date";
-
 
     public static final String TO_JSON = "tojson";
     public static final String STOP_MOVING = "stop_moving";

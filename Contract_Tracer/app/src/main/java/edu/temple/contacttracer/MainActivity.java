@@ -118,7 +118,6 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     //Date for positive report
     List<Long> positive_report_date;
 
-
     //Receive the message from the FCM class . Include Tracking and Tracing message
     final BroadcastReceiver FCM_BroadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -139,16 +138,17 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                     long sedentary_begin = jsonObject.getLong(CONSTANT.SEDENTARY_BEGIN);
                     long sedentary_end = jsonObject.getLong(CONSTANT.SEDENTARY_END);
 
-                    UUID uuid = UUID.fromString(uuid_in_string);
+                    try {
 
+                        UUID uuid = UUID.fromString(uuid_in_string);
+                    } catch (Exception e) {
+                        Log.d("Error", "Someone send something else");
+                    }
                     //Token(double latitude, double longtitude, long sedentary_begin, long sedentary_end, LocalDate date)
                     Token other_tocken = new Token(uuid, latitude, longtitude, sedentary_begin, sedentary_end);
+
                     temporary_token_container.others_add(other_tocken);
                     temporary_token_container.discard_repeate();
-
-                    String other_json = gson.toJson(temporary_token_container);
-                    editor.putString(CONSTANT.TO_JSON, other_json);
-                    editor.commit();
 
                 }
 
@@ -173,12 +173,28 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
                     Log.d("POSITIVE_REPORT_DATE", positive_report_date.toString());
 
+
                 }
             } catch (Exception e) {
                 System.out.println(e);
             }
         }
     };
+    //save boolean;
+    public boolean issave = false;
+
+    public ArrayList<Token> matching(JSONArray others_filtered_uuids) throws JSONException {
+        ArrayList<Token> suspecious_token = new ArrayList<Token>();
+
+        for (Token token : list_retrieve_token_container.Other_tokenArrayList) {
+            for (int i = 0; i < others_filtered_uuids.length(); i++) {
+                if (token.uuid.equals(others_filtered_uuids.get(i))) {
+                    suspecious_token.add(token);
+                }
+            }
+        }
+        return suspecious_token;
+    }
 
     public JSONArray filter_uuids_return_other(JSONArray mine_uuids, JSONArray others_uuids) throws JSONException {
         JSONArray return_values = new JSONArray();
@@ -222,6 +238,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         //init Token container
         temporary_token_container = new Token_Container();
         list_retrieve_token_container = new Token_Container();
+
 
         //init toolbar init
         toolbar = findViewById(R.id.my_toolbar);
@@ -287,9 +304,6 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                         Token token = new Token(null, latitude, longtitude, sedentary_begin, sedentary_end);
                         temporary_token_container.mine_add(token);
                         uuid = token.uuid;
-                        String json = gson.toJson(temporary_token_container);
-                        editor.putString(CONSTANT.TO_JSON, json);
-                        editor.commit();
 
                         send_tracking_post_request();
                     }
@@ -336,6 +350,19 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     protected void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(FCM_BroadcastReceiver);
+
+        if (temporary_token_container.My_tokenArrayList.isEmpty()) {
+            Log.d("ERROR", "YOU DOES NOT SAVE THE FILE");
+        } else {
+            String save_file = gson.toJson(temporary_token_container);
+            editor.putString(CONSTANT.TO_JSON, save_file);
+            issave = true;
+            editor.putBoolean(CONSTANT.SAVED, issave);
+            editor.commit();
+            Log.d("SUCCESS", "YOU SAVE THE FILE");
+        }
+
+
     }
 
     @Override
@@ -344,6 +371,17 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         if (broadcastReceiver != null) {
             unregisterReceiver(broadcastReceiver);
         }
+        if (temporary_token_container.My_tokenArrayList.isEmpty()) {
+            Log.d("ERROR", "YOU DOES NOT SAVE THE FILE");
+        } else {
+            String save_file = gson.toJson(temporary_token_container);
+            editor.putString(CONSTANT.TO_JSON, save_file);
+            issave = true;
+            editor.putBoolean(CONSTANT.SAVED, issave);
+            editor.commit();
+            Log.d("SUCCESS", "YOU SAVE THE FILE");
+        }
+
     }
 
 
@@ -379,16 +417,14 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
     //Rebot the emulator retrive the list from the share preference
     public void list_retrieve() {
-        String json = sharedpreferences.getString(CONSTANT.TO_JSON, null);
-        list_retrieve_token_container = gson.fromJson(json, Token_Container.class);
+        String restore_data = sharedpreferences.getString(CONSTANT.TO_JSON, null);
 
         try {
+            list_retrieve_token_container = gson.fromJson(restore_data, Token_Container.class);
             list_retrieve_token_container.expire_days_checker();
-            System.out.println("list retrieve Mine: \n" + list_retrieve_token_container.print_mine_tokens());
-            System.out.println("list retrieve Others: \n" + list_retrieve_token_container.print_others_tokens());
 
         } catch (Exception e) {
-            System.out.println("it is empty");
+            System.out.println("CONTAINER EMPTY");
         }
 
 
@@ -433,9 +469,14 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             public void onClick(View view) {
                 editor.clear();
                 editor.commit();
-                temporary_token_container.clear_mine();
-                temporary_token_container.clear_others();
-                System.out.println("Tokens have been all clear");
+                try {
+                    temporary_token_container.clear_mine();
+                    temporary_token_container.clear_others();
+                    issave = false;
+                    System.out.println("Tokens have been all clear");
+                } catch (Exception e) {
+                    System.out.println(e.toString());
+                }
             }
         });
 
@@ -443,6 +484,12 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             @Override
             public void onClick(View view) {
                 list_retrieve();
+                try {
+                    System.out.println("list retrieve Mine: \n -------------------------------------------\n" + list_retrieve_token_container.print_mine_tokens());
+                    System.out.println("list retrieve Others: \n-----------------------------------------\n" + list_retrieve_token_container.print_others_tokens());
+                } catch (Exception e) {
+                    Log.d("EXCEPTION: ", "LIST ARE EMPTY");
+                }
             }
         });
 
@@ -478,8 +525,8 @@ public class MainActivity extends AppCompatActivity implements value_sender {
             @Override
             public void onClick(View view) {
                 Token token = new Token(null, latitude, longtitude, sedentary_begin, sedentary_end);
-                temporary_token_container.mine_add(token);
 
+                temporary_token_container.mine_add(token);
                 String json = gson.toJson(temporary_token_container);
                 editor.putString(CONSTANT.TO_JSON, json);
                 editor.commit();
@@ -558,7 +605,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     public void send_tracing_post_request() {
         //POST REQUEST BEGIN
         RequestQueue postqueue = Volley.newRequestQueue(this);
-        StringRequest postquest = new StringRequest(Request.Method.POST, tracing_url, 
+        StringRequest postquest = new StringRequest(Request.Method.POST, tracing_url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -577,8 +624,12 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
                 list_retrieve();
 
+                try {
+                    my_uuids_jsonArray = list_retrieve_token_container.get_all_my_uuid();
+                } catch (Exception e) {
+                    Log.d("Exception", e.toString());
+                }
                 //send all my uuids
-                my_uuids_jsonArray = list_retrieve_token_container.get_all_my_uuid();
                 date_long = Instant.now().toEpochMilli();
 
                 params.put(CONSTANT.UUIDS, my_uuids_jsonArray.toString());
