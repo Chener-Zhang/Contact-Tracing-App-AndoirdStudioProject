@@ -23,7 +23,7 @@ public class TracingFragment extends Fragment implements OnMapReadyCallback {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final int ZOOM = 15;
+    private static final int ZOOM = 10;
     GoogleMap my_map;
     MapView mapView;
     // TODO: Rename and change types of parameters

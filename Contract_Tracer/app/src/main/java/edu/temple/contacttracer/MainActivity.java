@@ -505,7 +505,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         test_map.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                map_fragement_transaction(-80.54341666666666, 25.533518333333337);
+                map_fragement_transaction(67.36855, 26.08704);
             }
         });
         clear_button.setOnClickListener(new View.OnClickListener() {
@@ -598,7 +598,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         //create a new setting fragment
-        TracingFragment tracingFragment = TracingFragment.newInstance(null, null);
+        TracingFragment tracingFragment = TracingFragment.newInstance(longtitude, latitude);
         fragmentTransaction.replace(R.id.fragment_container, tracingFragment).addToBackStack(null);
         fragmentTransaction.commit();
     }
