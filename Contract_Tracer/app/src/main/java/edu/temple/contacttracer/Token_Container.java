@@ -1,6 +1,5 @@
 package edu.temple.contacttracer;
 
-import android.location.Location;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -44,19 +43,6 @@ public class Token_Container {
 
 
 
-    //Use the formular online
-    public float distance_calculator(double latitudeA, double latitudeB, double longtitudeA, double longtitudeB) {
-        Location A = new Location("A");
-        Location B = new Location("B");
-
-        A.setLatitude(latitudeA);
-        B.setLatitude(latitudeB);
-        A.setLongitude(longtitudeA);
-        B.setLongitude(longtitudeB);
-        float distance = A.distanceTo(B);
-
-        return distance;
-    }
 
 
     // add

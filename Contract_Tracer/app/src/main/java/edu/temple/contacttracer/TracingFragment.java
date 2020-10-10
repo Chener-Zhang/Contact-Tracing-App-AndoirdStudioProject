@@ -36,13 +36,22 @@ public class TracingFragment extends Fragment implements OnMapReadyCallback {
     }
 
 
-    public static TracingFragment newInstance(String param1, String param2) {
+    public static TracingFragment newInstance(Double param1, Double param2) {
         TracingFragment fragment = new TracingFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putDouble(ARG_PARAM1, param1);
+        args.putDouble(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            longtitude = getArguments().getDouble(ARG_PARAM1);
+            latitude = getArguments().getDouble(ARG_PARAM2);
+        }
     }
 
     @Override
@@ -68,15 +77,6 @@ public class TracingFragment extends Fragment implements OnMapReadyCallback {
         my_map.moveCamera(cameraUpdate);
         my_map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         my_map.addMarker(markerOptions);
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            longtitude = getArguments().getDouble(ARG_PARAM1);
-            latitude = getArguments().getDouble(ARG_PARAM2);
-        }
     }
 
     @Override

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -55,6 +56,72 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     public Button stop_button;
     public Button token_generator;
     public Button clear_button;
+
+
+    //User input declaration
+    public String userinput_distance;
+    public String userinput_time;
+
+
+    //Tool bar
+    public Toolbar toolbar;
+    public MenuItem menuItem;
+
+
+    //URL
+    public static String tracking_url = "https://kamorris.com/lab/ct_tracking.php";
+    public static String tracing_url = "https://kamorris.com/lab/ct_tracing.php";
+
+    //Dynamic Variable;
+    public UUID uuid;
+    public double longtitude;
+    public double latitude;
+    public long sedentary_begin;
+    public long sedentary_end;
+    public MenuItem date_picker;
+    public Button get_sick_button;
+
+
+    //Firebase intent
+    Intent firebase_intent;
+    public Button Get_token;
+    SharedPreferences sharedpreferences;
+    SharedPreferences.Editor editor;
+
+
+    //Token
+    Token_Container temporary_token_container;
+    Token_Container list_retrieve_token_container;
+    ArrayList<Token> SUSPICIOUS_TOKEN;
+
+    //Gson
+    Gson gson;
+
+    //Spinner
+    public boolean stop_moving;
+
+
+    //My location
+    String mylocation;
+
+    //JsonArray UUIDS and long DATE
+    JSONArray others_tracing_uuids_jsonArray;
+    JSONArray my_uuids_jsonArray;
+    long date_long;
+
+
+    //Receiver
+    public BroadcastReceiver broadcastReceiver;
+
+    //FCM Broad Cast Receiver
+    IntentFilter FCM_IntentFilter;
+
+
+    //Date for positive report
+    List<Long> positive_report_date;
+    public Button test_map;
+    //save boolean;
+
     //Receive the message from the FCM class . Include Tracking and Tracing message
     final BroadcastReceiver FCM_BroadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -112,6 +179,10 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                     //add the positive date to the calendar fragment
                     positive_report_date.add((Long) object.get(CONSTANT.DATE));
 
+                    SUSPICIOUS_TOKEN = matching(others_tracing_uuids_jsonArray);
+                    System.out.println("SUSPICIOUS_TOKEN" + SUSPICIOUS_TOKEN.toString());
+                    should_send_notification(SUSPICIOUS_TOKEN);
+
                     Log.d("POSITIVE_REPORT_DATE", positive_report_date.toString());
 
 
@@ -122,70 +193,32 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         }
     };
 
+    //TraceFragment shown when TRACING message received and app in foreground
+    public void should_send_notification(ArrayList<Token> tokens) {
+        for (Token mine : list_retrieve_token_container.My_tokenArrayList) {
+            for (Token someone : tokens) {
+                // check the distance whether 2 people are close to each other
+                if (distance_calculator(mine.latitude, someone.latitude, mine.longtitude, someone.longtitude) < 20) {
+                    map_fragement_transaction(someone.longtitude, someone.latitude);
+                    return;
+                }
+            }
+        }
+    }
 
-    //User input declaration
-    public String userinput_distance;
-    public String userinput_time;
+    //Use the formular online
+    public float distance_calculator(double latitudeA, double latitudeB, double longtitudeA, double longtitudeB) {
+        Location A = new Location("A");
+        Location B = new Location("B");
 
+        A.setLatitude(latitudeA);
+        B.setLatitude(latitudeB);
+        A.setLongitude(longtitudeA);
+        B.setLongitude(longtitudeB);
+        float distance = A.distanceTo(B);
 
-    //Tool bar
-    public Toolbar toolbar;
-    public MenuItem menuItem;
-
-
-    //URL
-    public static String tracking_url = "https://kamorris.com/lab/ct_tracking.php";
-    public static String tracing_url = "https://kamorris.com/lab/ct_tracing.php";
-
-    //Dynamic Variable;
-    public UUID uuid;
-    public double longtitude;
-    public double latitude;
-    public long sedentary_begin;
-    public long sedentary_end;
-    public MenuItem date_picker;
-    public Button get_sick_button;
-
-
-    //Firebase intent
-    Intent firebase_intent;
-    public Button Get_token;
-    SharedPreferences sharedpreferences;
-    SharedPreferences.Editor editor;
-
-
-    //Token
-    Token_Container temporary_token_container;
-    Token_Container list_retrieve_token_container;
-
-    //Gson
-    Gson gson;
-
-    //Spinner
-    public boolean stop_moving;
-
-
-    //My location
-    String mylocation;
-
-    //JsonArray UUIDS and long DATE
-    JSONArray others_tracing_uuids_jsonArray;
-    JSONArray my_uuids_jsonArray;
-    long date_long;
-
-
-    //Receiver
-    public BroadcastReceiver broadcastReceiver;
-
-    //FCM Broad Cast Receiver
-    IntentFilter FCM_IntentFilter;
-
-
-    //Date for positive report
-    List<Long> positive_report_date;
-    public Button test_map;
-    //save boolean;
-
+        return distance;
+    }
 
     public ArrayList<Token> matching(JSONArray others_filtered_uuids) throws JSONException {
         ArrayList<Token> suspecious_token = new ArrayList<Token>();
@@ -242,7 +275,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         //init Token container
         temporary_token_container = new Token_Container();
         list_retrieve_token_container = new Token_Container();
-
+        SUSPICIOUS_TOKEN = new ArrayList<Token>();
 
         //init toolbar init
         toolbar = findViewById(R.id.my_toolbar);
@@ -472,7 +505,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         test_map.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                map_fragement_transaction();
+                map_fragement_transaction(-80.54341666666666, 25.533518333333337);
             }
         });
         clear_button.setOnClickListener(new View.OnClickListener() {
@@ -560,12 +593,10 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
     }
 
-    public void map_fragement_transaction() {
-
+    public void map_fragement_transaction(double longtitude, double latitude) {
         //Basic Fragment Manager setup
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
         //create a new setting fragment
         TracingFragment tracingFragment = TracingFragment.newInstance(null, null);
         fragmentTransaction.replace(R.id.fragment_container, tracingFragment).addToBackStack(null);
