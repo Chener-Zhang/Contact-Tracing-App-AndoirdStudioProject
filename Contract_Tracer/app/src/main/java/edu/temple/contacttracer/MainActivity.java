@@ -185,7 +185,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     List<Long> positive_report_date;
     public Button test_map;
     //save boolean;
-    public boolean issave = false;
+
 
     public ArrayList<Token> matching(JSONArray others_filtered_uuids) throws JSONException {
         ArrayList<Token> suspecious_token = new ArrayList<Token>();
@@ -483,7 +483,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                 try {
                     temporary_token_container.clear_mine();
                     temporary_token_container.clear_others();
-                    issave = false;
+
                     System.out.println("Tokens have been all clear");
                 } catch (Exception e) {
                     System.out.println(e.toString());
