@@ -55,6 +55,72 @@ public class MainActivity extends AppCompatActivity implements value_sender {
     public Button stop_button;
     public Button token_generator;
     public Button clear_button;
+    //Receive the message from the FCM class . Include Tracking and Tracing message
+    final BroadcastReceiver FCM_BroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String tracking_json = intent.getStringExtra(CONSTANT.JSON_FROM_BROADCAST_TRACKING);
+            String tracing_json = intent.getStringExtra(CONSTANT.JSON_FROM_BROADCAST_TRACING);
+
+            mylocation = intent.getStringExtra(CONSTANT.MYLOCATION);
+
+            //Retrieve tracking FCM message;
+            try {
+                if (tracking_json != null) {
+                    JSONObject jsonObject = new JSONObject(tracking_json);
+
+                    String uuid_in_string = (String) jsonObject.get(CONSTANT.UUID);
+                    double latitude = jsonObject.getDouble(CONSTANT.LATITUDE);
+                    double longtitude = jsonObject.getDouble(CONSTANT.LONGTITUDE);
+                    long sedentary_begin = jsonObject.getLong(CONSTANT.SEDENTARY_BEGIN);
+                    long sedentary_end = jsonObject.getLong(CONSTANT.SEDENTARY_END);
+
+                    try {
+                        UUID uuid = UUID.fromString(uuid_in_string);
+                        //Token(double latitude, double longtitude, long sedentary_begin, long sedentary_end, LocalDate date)
+                        Token other_tocken = new Token(uuid, latitude, longtitude, sedentary_begin, sedentary_end);
+
+                        temporary_token_container.others_add(other_tocken);
+                        temporary_token_container.discard_repeate();
+
+                        String json = gson.toJson(temporary_token_container);
+                        editor.putString(CONSTANT.TO_JSON, json);
+                        editor.commit();
+
+                    } catch (Exception e) {
+                        Log.d("Error", "Someone send something else");
+                    }
+
+                }
+
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            //Retrieve tracing FCM message
+            try {
+                if (tracing_json != null) {
+                    Log.d("BRAOD CAST FROM TRACING TO MAIN ACTIVITIES", "RECEIVED");
+
+                    list_retrieve();
+
+                    JSONObject object = new JSONObject(tracing_json);
+                    JSONArray all_uuids_jsonAray = object.getJSONArray(CONSTANT.UUIDS);
+
+                    others_tracing_uuids_jsonArray = filter_uuids_return_other(my_uuids_jsonArray, all_uuids_jsonAray);
+
+                    //add the positive date to the calendar fragment
+                    positive_report_date.add((Long) object.get(CONSTANT.DATE));
+
+                    Log.d("POSITIVE_REPORT_DATE", positive_report_date.toString());
+
+
+                }
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        }
+    };
 
 
     //User input declaration
@@ -117,73 +183,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
 
     //Date for positive report
     List<Long> positive_report_date;
-
-    //Receive the message from the FCM class . Include Tracking and Tracing message
-    final BroadcastReceiver FCM_BroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String tracking_json = intent.getStringExtra(CONSTANT.JSON_FROM_BROADCAST_TRACKING);
-            String tracing_json = intent.getStringExtra(CONSTANT.JSON_FROM_BROADCAST_TRACING);
-
-            mylocation = intent.getStringExtra(CONSTANT.MYLOCATION);
-
-            //Retrieve tracking FCM message;
-            try {
-                if (tracking_json != null) {
-                    JSONObject jsonObject = new JSONObject(tracking_json);
-
-                    String uuid_in_string = (String) jsonObject.get(CONSTANT.UUID);
-                    double latitude = jsonObject.getDouble(CONSTANT.LATITUDE);
-                    double longtitude = jsonObject.getDouble(CONSTANT.LONGTITUDE);
-                    long sedentary_begin = jsonObject.getLong(CONSTANT.SEDENTARY_BEGIN);
-                    long sedentary_end = jsonObject.getLong(CONSTANT.SEDENTARY_END);
-
-                    try {
-
-                        UUID uuid = UUID.fromString(uuid_in_string);
-                    } catch (Exception e) {
-                        Log.d("Error", "Someone send something else");
-                    }
-                    //Token(double latitude, double longtitude, long sedentary_begin, long sedentary_end, LocalDate date)
-                    Token other_tocken = new Token(uuid, latitude, longtitude, sedentary_begin, sedentary_end);
-
-                    temporary_token_container.others_add(other_tocken);
-                    temporary_token_container.discard_repeate();
-
-                    String json = gson.toJson(temporary_token_container);
-                    editor.putString(CONSTANT.TO_JSON, json);
-                    editor.commit();
-
-                }
-
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            //Retrieve tracing FCM message
-            try {
-                if (tracing_json != null) {
-                    Log.d("BRAOD CAST FROM TRACING TO MAIN ACTIVITIES", "RECEIVED");
-
-                    list_retrieve();
-
-                    JSONObject object = new JSONObject(tracing_json);
-                    JSONArray all_uuids_jsonAray = object.getJSONArray(CONSTANT.UUIDS);
-
-                    others_tracing_uuids_jsonArray = filter_uuids_return_other(my_uuids_jsonArray, all_uuids_jsonAray);
-
-                    //add the positive date to the calendar fragment
-                    positive_report_date.add((Long) object.get(CONSTANT.DATE));
-
-                    Log.d("POSITIVE_REPORT_DATE", positive_report_date.toString());
-
-
-                }
-            } catch (Exception e) {
-                System.out.println(e);
-            }
-        }
-    };
+    public Button test_map;
     //save boolean;
     public boolean issave = false;
 
@@ -466,7 +466,15 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         clear_button = findViewById(R.id.clear);
         Get_token = findViewById(R.id.get_tocken);
         get_sick_button = findViewById(R.id.send_report);
+        test_map = findViewById(R.id.test_map);
 
+
+        test_map.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                map_fragement_transaction();
+            }
+        });
         clear_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -551,6 +559,19 @@ public class MainActivity extends AppCompatActivity implements value_sender {
         fragmentTransaction.commit();
 
     }
+
+    public void map_fragement_transaction() {
+
+        //Basic Fragment Manager setup
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        //create a new setting fragment
+        TracingFragment tracingFragment = TracingFragment.newInstance(null, null);
+        fragmentTransaction.replace(R.id.fragment_container, tracingFragment).addToBackStack(null);
+        fragmentTransaction.commit();
+    }
+
 
     public void setDate_picker_fragment_transaction() {
         //Basic Fragment Manager setup
