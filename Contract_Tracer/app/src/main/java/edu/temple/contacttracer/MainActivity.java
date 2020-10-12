@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements value_sender {
                     System.out.println("SUSPICIOUS_TOKEN" + SUSPICIOUS_TOKEN.toString());
                     should_send_notification(SUSPICIOUS_TOKEN);
 
-                    
+
 
 
                     Log.d("POSITIVE_REPORT_DATE", positive_report_date.toString());
